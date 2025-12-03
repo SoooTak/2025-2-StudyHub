@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인 - StudyHub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fb;
+        }
+
+        header {
+            background-color: #2b4cff;
+            color: #ffffff;
+            padding: 16px 24px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        main {
+            max-width: 480px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            padding: 24px 28px;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 22px;
+        }
+
+        .field {
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #d0d5dd;
+            font-size: 14px;
+        }
+
+        .error {
+            margin-bottom: 12px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background-color: #ffe5e5;
+            color: #b00020;
+            font-size: 13px;
+        }
+
+        .info {
+            margin-bottom: 12px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background-color: #e5f0ff;
+            color: #234;
+            font-size: 13px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px 0;
+            border-radius: 8px;
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            background-color: #2b4cff;
+            color: #ffffff;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .sub-text {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #777;
+            text-align: center;
+        }
+
+        a {
+            color: #2b4cff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<header>
+    StudyHub
+</header>
+<main>
+    <h1>로그인</h1>
+
+    <!-- 로그인 실패 시 ?error 파라미터가 붙음 -->
+    <div th:if="${param.error}" class="error">
+        이메일 또는 비밀번호가 올바르지 않습니다.
+    </div>
+
+    <!-- 로그아웃 후 ?logout 파라미터가 붙음 -->
+    <div th:if="${param.logout}" class="info">
+        로그아웃되었습니다.
+    </div>
+
+    <form th:action="@{/login}" method="post">
+        <div class="field">
+            <label for="email">이메일</label>
+            <input type="email" id="email" name="email" placeholder="example@studyhub.com" required>
+        </div>
+
+        <div class="field">
+            <label for="password">비밀번호</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+
+        <button type="submit">로그인</button>
+    </form>
+
+    <div class="sub-text">
+        아직 계정이 없나요? <a href="/signup">회원가입 하기</a>
+    </div>
+</main>
+</body>
+</html>

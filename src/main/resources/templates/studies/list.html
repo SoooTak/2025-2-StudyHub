@@ -2,7 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${title}">StudyHub</title>
+    <title>스터디 목록 - StudyHub</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
@@ -37,6 +37,12 @@
             margin-right: 4px;
         }
 
+        .nav-right a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
         .link-btn,
         .link-button {
             display: inline-block;
@@ -67,7 +73,7 @@
 
         main {
             max-width: 960px;
-            margin: 40px auto;
+            margin: 32px auto;
             background-color: #ffffff;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
@@ -79,30 +85,76 @@
             font-size: 24px;
         }
 
-        p {
-            margin: 8px 0 0 0;
+        .actions {
+            margin: 8px 0 16px 0;
+            text-align: right;
+        }
+
+        .primary-btn {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: none;
+            background-color: #2b4cff;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .primary-btn:hover {
+            opacity: 0.9;
+        }
+
+        .study-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .study-card {
+            border-radius: 10px;
+            border: 1px solid #e0e4f0;
+            padding: 14px 16px;
+        }
+
+        .study-card h2 {
+            margin: 0 0 4px 0;
+            font-size: 18px;
+        }
+
+        .study-card p {
+            margin: 4px 0;
             color: #555;
-        }
-
-        .tagline {
-            margin-top: 12px;
-            color: #888;
             font-size: 14px;
         }
 
-        .link-to-studies {
-            margin-top: 20px;
-            font-size: 14px;
+        .meta {
+            margin-top: 6px;
+            font-size: 12px;
+            color: #777;
         }
 
-        .link-to-studies a {
+        .meta span {
+            margin-right: 12px;
+        }
+
+        .detail-link {
+            display: inline-block;
+            margin-top: 6px;
+            font-size: 13px;
             color: #2b4cff;
             text-decoration: none;
-            font-weight: 600;
         }
 
-        .link-to-studies a:hover {
+        .detail-link:hover {
             text-decoration: underline;
+        }
+
+        .empty {
+            color: #777;
+            font-size: 14px;
+            margin-top: 12px;
         }
     </style>
 </head>
@@ -127,16 +179,27 @@
     </div>
 </header>
 <main>
-    <h1 th:text="${title}">StudyHub 메인</h1>
-    <p th:text="${message}">
-        스터디 통합 운영 웹사이트의 시작 페이지입니다.
-    </p>
-    <p class="tagline">
-        앞으로 이 화면에서 스터디 탐색, 내 스터디, 알림, 출석 관리 등의 기능이 들어갈 예정입니다.
-    </p>
-    <div class="link-to-studies">
-        👉 지금 바로 <a href="/studies">공개 스터디 보러가기</a><br>
-        👉 내가 참여 중인 <a href="/my/studies">내 스터디 확인하기</a>
+    <h1>공개 스터디 목록</h1>
+    <p>누구나 신청할 수 있는 공개 스터디입니다.</p>
+
+    <div class="actions">
+        <a href="/my/studies/new" class="primary-btn">스터디 개설하기</a>
+    </div>
+
+    <div class="study-list">
+        <div th:if="${#lists.isEmpty(studies)}" class="empty">
+            현재 등록된 스터디가 없습니다. 첫 번째 스터디를 개설해 보세요!
+        </div>
+
+        <div th:each="study : ${studies}" class="study-card">
+            <h2 th:text="${study.title}">스터디 제목</h2>
+            <p th:text="${study.description}">스터디 소개</p>
+            <div class="meta">
+                <span th:text="'카테고리: ' + (${study.category} ?: '미지정')">카테고리</span>
+                <span th:text="'모집 인원: ' + ${study.maxMembers} + '명'">모집 인원</span>
+            </div>
+            <a th:href="@{'/studies/' + ${study.id}}" class="detail-link">자세히 보기</a>
+        </div>
     </div>
 </main>
 </body>

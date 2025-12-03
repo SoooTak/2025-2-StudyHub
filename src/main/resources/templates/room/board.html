@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${study.title} + ' - 게시판 - StudyHub'">게시판 - StudyHub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fb;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        header {
+            background-color: #1f3b8f;
+            color: #ffffff;
+            padding: 12px 20px;
+        }
+        .header-inner {
+            max-width: 1040px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-weight: 700;
+            font-size: 20px;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+        }
+        .nav-links a {
+            padding: 6px 10px;
+            border-radius: 999px;
+        }
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.16);
+        }
+        .login-email {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        main {
+            max-width: 1040px;
+            margin: 24px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            padding: 22px 26px 30px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+        .meta {
+            margin-top: 8px;
+            font-size: 13px;
+            color: #666;
+        }
+        .meta span {
+            margin-right: 12px;
+        }
+
+        .section-title {
+            margin-top: 20px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+        thead {
+            background-color: #f0f3ff;
+        }
+        th, td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #e0e4f0;
+            text-align: left;
+        }
+        th {
+            font-weight: 600;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #fafbff;
+        }
+        .empty {
+            padding: 8px 0;
+            font-size: 13px;
+            color: #777;
+        }
+
+        .badge-notice {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            background-color: #fff4e0;
+            border: 1px solid #f0c27b;
+            color: #b07219;
+            margin-right: 6px;
+        }
+
+        .write-card {
+            margin-top: 26px;
+            padding-top: 18px;
+            border-top: 1px dashed #d0d7ec;
+        }
+        .write-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .form-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+        .form-row label {
+            font-weight: 500;
+        }
+        .form-row input,
+        .form-row textarea,
+        .form-row select {
+            padding: 6px 8px;
+            border-radius: 6px;
+            border: 1px solid #cfd5e8;
+            font-size: 13px;
+        }
+        .form-row textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        .form-row input:focus,
+        .form-row textarea:focus,
+        .form-row select:focus {
+            outline: none;
+            border-color: #1f3b8f;
+            box-shadow: 0 0 0 1px rgba(31,59,143,0.12);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .btn-primary {
+            background-color: #1f3b8f;
+            color: #ffffff;
+        }
+        .btn-primary:hover {
+            background-color: #182f72;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 16px;
+            font-size: 13px;
+            color: #1f3b8f;
+        }
+
+        @media (max-width: 640px) {
+            main {
+                margin: 0;
+                border-radius: 0;
+            }
+            .header-inner {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+            table {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-inner">
+        <div class="logo">
+            <a href="/" style="color: #ffffff;">StudyHub</a>
+        </div>
+        <div class="nav-links">
+            <a href="/">홈</a>
+            <a href="/studies">스터디 탐색</a>
+            <span th:if="${loggedIn}" class="login-email" th:text="${loginEmail}">user@example.com</span>
+            <a th:if="${loggedIn}" href="/logout">로그아웃</a>
+            <a th:if="${!loggedIn}" href="/login">로그인</a>
+            <a th:if="${!loggedIn}" href="/signup">회원가입</a>
+        </div>
+    </div>
+</header>
+
+<main>
+    <h1 th:text="${study.title} + ' - 게시판'">게시판</h1>
+    <div class="meta">
+        <span th:text="'카테고리: ' + (${study.category} ?: '미지정')">카테고리</span>
+        <span th:text="'진행 방식: ' + (${study.studyMode} ?: '미지정')">진행 방식</span>
+    </div>
+
+    <!-- 공지 목록 -->
+    <div class="section-title">공지</div>
+    <div th:if="${#lists.isEmpty(noticePosts)}" class="empty">
+        등록된 공지가 없습니다.
+    </div>
+    <table th:if="${!#lists.isEmpty(noticePosts)}">
+        <thead>
+        <tr>
+            <th>제목</th>
+            <th>작성자</th>
+            <th>작성일</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="postItem : ${noticePosts}">
+            <td>
+                <a th:href="@{'/room/' + ${study.id} + '/board/' + ${postItem.id}}">
+                    <span class="badge-notice">공지</span>
+                    <span th:text="${postItem.title}">제목</span>
+                </a>
+            </td>
+            <td th:text="${postItem.writer.nickname}">작성자</td>
+            <td th:text="${#temporals.format(postItem.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 일반 게시글 목록 -->
+    <div class="section-title">게시글</div>
+    <div th:if="${#lists.isEmpty(posts)}" class="empty">
+        아직 작성된 게시글이 없습니다.
+    </div>
+    <table th:if="${!#lists.isEmpty(posts)}">
+        <thead>
+        <tr>
+            <th>제목</th>
+            <th>작성자</th>
+            <th>작성일</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="postItem : ${posts}">
+            <td>
+                <a th:href="@{'/room/' + ${study.id} + '/board/' + ${postItem.id}}">
+                    <span th:if="${postItem.type.name() == 'NOTICE'}" class="badge-notice">공지</span>
+                    <span th:text="${postItem.title}">제목</span>
+                </a>
+            </td>
+            <td th:text="${postItem.writer.nickname}">작성자</td>
+            <td th:text="${#temporals.format(postItem.createdAt, 'yyyy-MM-dd HH:mm')}">날짜</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 글쓰기 -->
+    <div class="write-card">
+        <div class="write-title">새 글 작성</div>
+        <form th:action="@{'/room/' + ${study.id} + '/board/new'}"
+              method="post"
+              th:object="${postForm}">
+            <div class="form-row">
+                <label for="title">제목</label>
+                <input id="title" type="text" th:field="*{title}" required>
+            </div>
+
+            <!-- 타입 선택: 누구나 보이지만 서버에서 권한 검증 -->
+            <div class="form-row">
+                <label for="type">글 종류</label>
+                <select id="type" th:field="*{type}">
+                    <option th:value="${T(com.studyhub.board.PostType).NORMAL}">일반</option>
+                    <option th:value="${T(com.studyhub.board.PostType).NOTICE}">공지</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <label for="content">내용</label>
+                <textarea id="content" th:field="*{content}" required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">등록</button>
+        </form>
+    </div>
+
+    <a th:href="@{'/room/' + ${study.id}}" class="back-link">← 스터디 홈으로 돌아가기</a>
+</main>
+</body>
+</html>

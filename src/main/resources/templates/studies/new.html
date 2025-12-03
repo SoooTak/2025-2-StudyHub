@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>스터디 개설 - StudyHub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fb;
+        }
+
+        header {
+            background-color: #2b4cff;
+            color: #ffffff;
+            padding: 16px 24px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        main {
+            max-width: 640px;
+            margin: 32px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            padding: 24px 28px;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 22px;
+        }
+
+        .field {
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 4px;
+            color: #333;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #d0d5dd;
+            font-size: 14px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .inline {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .inline input[type="number"] {
+            width: 120px;
+        }
+
+        .error {
+            margin-bottom: 12px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background-color: #ffe5e5;
+            color: #b00020;
+            font-size: 13px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px 0;
+            border-radius: 8px;
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            background-color: #2b4cff;
+            color: #ffffff;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #2b4cff;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<header>
+    StudyHub - 스터디 개설
+</header>
+<main>
+    <h1>새 스터디 개설</h1>
+
+    <div th:if="${errorMessage}" class="error" th:text="${errorMessage}">
+        에러 메시지
+    </div>
+
+    <form th:action="@{/my/studies/new}" th:object="${form}" method="post">
+        <div class="field">
+            <label for="title">스터디 이름*</label>
+            <input type="text" id="title" th:field="*{title}" required placeholder="예: 백엔드 스프링 스터디 3기">
+        </div>
+
+        <div class="field">
+            <label for="description">스터디 소개*</label>
+            <textarea id="description" th:field="*{description}"
+                      placeholder="어떤 스터디인지, 목표와 진행 방식을 간단히 적어주세요." required></textarea>
+        </div>
+
+        <div class="field">
+            <label for="category">카테고리</label>
+            <input type="text" id="category" th:field="*{category}" placeholder="예: 프로그래밍, 어학, 자격증">
+        </div>
+
+        <div class="field">
+            <label for="studyMode">진행 방식</label>
+            <input type="text" id="studyMode" th:field="*{studyMode}" placeholder="예: 온라인, 오프라인, 혼합">
+        </div>
+
+        <div class="field">
+            <label for="location">오프라인 장소</label>
+            <input type="text" id="location" th:field="*{location}" placeholder="예: 강남역 인근 카페">
+        </div>
+
+        <div class="field">
+            <label>모집 인원*</label>
+            <div class="inline">
+                <input type="number" min="1" th:field="*{maxMembers}" required>
+                <span>명 (리더 포함)</span>
+            </div>
+        </div>
+
+        <div class="field">
+            <label>
+                <input type="checkbox" th:field="*{public}">
+                공개 스터디로 등록 (체크 해제 시 비공개)
+            </label>
+        </div>
+
+        <button type="submit">스터디 개설하기</button>
+    </form>
+
+    <a href="/studies" class="back-link">← 스터디 목록으로 돌아가기</a>
+</main>
+</body>
+</html>

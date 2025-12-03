@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${study.title} + ' - 스터디 홈 - StudyHub'">스터디 홈 - StudyHub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fb;
+        }
+
+        header {
+            background-color: #2b4cff;
+            color: #ffffff;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .nav-right a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 4px 8px;
+            border-radius: 999px;
+        }
+
+        .nav-right a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .login-email {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        main {
+            max-width: 1040px;
+            margin: 32px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            padding: 22px 24px 26px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .study-meta {
+            margin-top: 8px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .study-meta span {
+            margin-right: 12px;
+        }
+
+        .role-badge {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            background-color: #eef1ff;
+            color: #2b4cff;
+        }
+
+        .grid {
+            margin-top: 22px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            border-radius: 10px;
+            border: 1px solid #e0e4f0;
+            padding: 14px 16px;
+            font-size: 14px;
+        }
+
+        .card-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .card-desc {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .card a {
+            font-size: 13px;
+            color: #2b4cff;
+            text-decoration: none;
+        }
+
+        .card a:hover {
+            text-decoration: underline;
+        }
+
+        .notice {
+            margin-top: 24px;
+            padding: 10px 12px;
+            font-size: 13px;
+            color: #555;
+            background-color: #f5f7ff;
+            border-radius: 8px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 16px;
+            font-size: 13px;
+            color: #2b4cff;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="brand">
+        <a href="/" style="color: #ffffff; text-decoration: none;">StudyHub</a>
+    </div>
+    <div class="nav-right">
+        <span th:if="${loggedIn}" class="login-email" th:text="${loginEmail}">user@example.com</span>
+        <a th:if="${loggedIn}" href="/logout">로그아웃</a>
+        <a th:if="${!loggedIn}" href="/login">로그인</a>
+        <a th:if="${!loggedIn}" href="/signup">회원가입</a>
+    </div>
+</header>
+
+<main>
+    <h1 th:text="${study.title}">스터디 제목</h1>
+
+    <div class="study-meta">
+        <span th:text="'분야: ' + (${study.category} ?: '미지정')">분야</span>
+        <span th:text="'모집 인원: ' + ${study.maxMembers} + '명'">모집 인원</span>
+        <span th:text="'공개 여부: ' + (${study.public} ? '공개' : '비공개')">공개 여부</span>
+        <span th:text="'진행 방식: ' + (${study.studyMode} ?: '미지정')">진행 방식</span>
+    </div>
+
+    <!-- 내 역할 -->
+    <div class="role-badge"
+         th:text="${isLeader} ? '내 역할: 리더(개설자)' : '내 역할: 멤버'">
+        내 역할
+    </div>
+
+    <!-- 기능 카드 그리드 -->
+    <div class="grid">
+        <div class="card">
+            <div class="card-title">공지 / 소개</div>
+            <div class="card-desc">
+                스터디 규칙, 진행 계획, 공지사항 등을 정리하는 영역입니다.
+            </div>
+            <a href="javascript:void(0);">준비 중입니다</a>
+        </div>
+
+        <div class="card">
+            <div class="card-title">출석 / 일정</div>
+            <div class="card-desc">
+                주차별 스터디 일정과 출석 체크를 관리하는 화면입니다.
+            </div>
+            <a th:href="@{'/room/' + ${study.id} + '/sessions'}">출석 / 일정 화면으로 이동</a>
+        </div>
+
+        <div class="card">
+            <div class="card-title">게시판 / 질문</div>
+            <div class="card-desc">
+                자료 공유, 질문/답변, 회고 등을 작성할 수 있는 게시판입니다.
+            </div>
+            <a th:href="@{'/room/' + ${study.id} + '/board'}">게시글 목록으로 이동</a>
+        </div>
+
+        <div class="card">
+            <div class="card-title">멤버 관리</div>
+            <div class="card-desc">
+                현재 스터디 인원과 역할(리더/매니저/멤버)을 확인하는 화면입니다.
+                이후 리더/매니저 권한 관리 기능이 추가될 예정입니다.
+            </div>
+            <a th:href="@{'/room/' + ${study.id} + '/members'}"
+               th:text="${isLeader} ? '멤버 관리 화면으로 이동' : '멤버 목록 보기'">
+                멤버 목록 보기
+            </a>
+        </div>
+    </div>
+
+    <div class="notice">
+        이 화면은 스터디 내부의 “대시보드”입니다. <br>
+        이곳에서 출석, 일정, 게시판, 멤버 목록 등 세부 화면으로 이동할 수 있습니다.
+    </div>
+
+    <a th:href="@{'/my/studies'}" class="back-link">← 내 스터디 목록으로 돌아가기</a>
+</main>
+</body>
+</html>
