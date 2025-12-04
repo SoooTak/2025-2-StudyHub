@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>스터디 관리 · StudyHub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/studyhub.css}">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--color-border-subtle);
+            text-align: left;
+        }
+        th {
+            background-color: #f3f4f6;
+            font-weight: 600;
+        }
+        .tag-public {
+            padding: 3px 7px;
+            border-radius: 999px;
+            font-size: 11px;
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        .tag-private {
+            padding: 3px 7px;
+            border-radius: 999px;
+            font-size: 11px;
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        .form-inline {
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+
+<th:block th:replace="fragments/header :: header"></th:block>
+
+<main class="page-container">
+    <section class="card">
+        <h1 class="section-title">스터디 관리</h1>
+        <p class="muted">
+            스터디 공개 여부를 제어할 수 있습니다.
+        </p>
+
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>제목</th>
+                <th>리더</th>
+                <th>공개 여부</th>
+                <th>생성일</th>
+                <th>관리</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="s : ${studies}">
+                <td th:text="${s.id}">1</td>
+                <td th:text="${s.title}">스터디 제목</td>
+                <td th:text="${s.leader != null ? s.leader.name : '-'}">리더 이름</td>
+                <td>
+                    <span th:if="${s.public}"
+                          class="tag-public">공개</span>
+                    <span th:if="${!s.public}"
+                          class="tag-private">비공개</span>
+                </td>
+                <td th:text="${#temporals.format(s.createdAt, 'yyyy-MM-dd HH:mm')}">2025-12-04</td>
+                <td>
+                    <form class="form-inline"
+                          th:if="${s.public}"
+                          th:action="@{|/admin/studies/${s.id}/hide|}"
+                          method="post">
+                        <button type="submit" class="btn-secondary">숨기기</button>
+                    </form>
+                    <form class="form-inline"
+                          th:if="${!s.public}"
+                          th:action="@{|/admin/studies/${s.id}/show|}"
+                          method="post">
+                        <button type="submit" class="btn-secondary">보이게</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div style="margin-top:16px;">
+            <a th:href="@{/admin/dashboard}" class="btn-secondary">대시보드로</a>
+        </div>
+    </section>
+</main>
+
+</body>
+</html>

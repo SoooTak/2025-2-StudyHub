@@ -4,85 +4,27 @@
     <meta charset="UTF-8">
     <title>스터디 목록 - StudyHub</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 🔹 공통 테마 CSS -->
+    <link rel="stylesheet" th:href="@{/css/studyhub.css}">
+
+    <!-- 🔹 이 페이지 전용 스타일 (body/header 건드리지 않음) -->
     <style>
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f7fb;
-        }
-
-        header {
-            background-color: #2b4cff;
-            color: #ffffff;
-            padding: 12px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .brand {
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-
-        .nav-right span {
-            margin-right: 4px;
-        }
-
-        .nav-right a {
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 13px;
-        }
-
-        .link-btn,
-        .link-button {
-            display: inline-block;
-            padding: 6px 10px;
-            border-radius: 999px;
-            border: 1px solid #ffffff;
-            background: transparent;
-            color: #ffffff;
-            font-size: 13px;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .link-btn.secondary {
-            border-color: #d0dcff;
-            background-color: #ffffff;
-            color: #2b4cff;
-        }
-
-        .link-btn:hover,
-        .link-button:hover {
-            opacity: 0.9;
-        }
-
-        .link-button {
-            border: 1px solid #ffffff;
-        }
-
-        main {
+        .studies-main {
             max-width: 960px;
-            margin: 32px auto;
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-            padding: 24px 28px;
+            margin: 0 auto;
         }
 
-        h1 {
+        .studies-main h1 {
             margin-top: 0;
             font-size: 24px;
+        }
+
+        .subtitle {
+            margin-top: 4px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            color: var(--color-text-muted);
         }
 
         .actions {
@@ -90,20 +32,63 @@
             text-align: right;
         }
 
-        .primary-btn {
-            display: inline-block;
-            padding: 8px 14px;
-            border-radius: 999px;
-            border: none;
-            background-color: #2b4cff;
-            color: #ffffff;
-            font-size: 13px;
-            font-weight: 600;
-            text-decoration: none;
+        /* 검색/필터 영역 */
+        .search-filter {
+            margin: 12px 0 20px 0;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background-color: var(--color-primary-soft);
+            border: 1px solid var(--color-border-subtle);
         }
 
-        .primary-btn:hover {
-            opacity: 0.9;
+        .search-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .form-field {
+            flex: 1 1 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        .form-field label {
+            font-size: 12px;
+            color: var(--color-text-muted);
+        }
+
+        .form-field input[type="text"],
+        .form-field select {
+            padding: 6px 8px;
+            border-radius: 8px;
+            border: 1px solid #cbd5f5;
+            font-size: 13px;
+        }
+
+        .form-field input[type="text"]:focus,
+        .form-field select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.15);
+        }
+
+        .search-actions {
+            margin-top: 10px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .search-actions .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 13px;
         }
 
         .study-list {
@@ -118,8 +103,16 @@
             padding: 14px 16px;
         }
 
+        .study-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
         .study-card h2 {
-            margin: 0 0 4px 0;
+            margin: 0;
             font-size: 18px;
         }
 
@@ -133,17 +126,16 @@
             margin-top: 6px;
             font-size: 12px;
             color: #777;
-        }
-
-        .meta span {
-            margin-right: 12px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
         .detail-link {
-            display: inline-block;
-            margin-top: 6px;
+            margin-top: 8px;
             font-size: 13px;
-            color: #2b4cff;
+            display: inline-block;
+            color: var(--color-primary);
             text-decoration: none;
         }
 
@@ -156,51 +148,160 @@
             font-size: 14px;
             margin-top: 12px;
         }
+
+        /* 참여 상태 뱃지 */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 500;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+
+        .status-joined {
+            background-color: #e0f2fe;
+            border-color: #38bdf8;
+            color: #0369a1;
+        }
+
+        .status-pending {
+            background-color: #fef9c3;
+            border-color: #facc15;
+            color: #854d0e;
+        }
+
+        .status-available {
+            background-color: #ecfdf3;
+            border-color: #22c55e;
+            color: #166534;
+        }
+
+        .card-footer {
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .card-footer-left {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .card-footer-right {
+            text-align: right;
+        }
+
+        .card-footer-right .detail-link {
+            margin-top: 0;
+        }
+
+        @media (max-width: 600px) {
+            .search-row {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
-<header>
-    <div class="brand">
-        <a href="/" style="color: #ffffff; text-decoration: none;">StudyHub</a>
-    </div>
-    <div class="nav-right">
-        <a href="/studies" class="link-btn secondary">스터디 탐색</a>
-        <a href="/my/studies" class="link-btn">내 스터디</a>
+    <!-- 🔹 공통 헤더 (흰색 topbar) -->
+    <th:block th:replace="fragments/header :: header"></th:block>
 
-        <!-- 로그인 O -->
-        <span th:if="${loggedIn}" th:text="${loginEmail} + ' 님'">user@example.com 님</span>
-        <form th:if="${loggedIn}" th:action="@{/logout}" method="post" style="margin: 0;">
-            <button type="submit" class="link-button">로그아웃</button>
-        </form>
+    <!-- 🔹 공통 배경/여백: page-container / card 활용 -->
+    <main class="page-container">
+        <section class="card studies-main">
+            <h1>공개 스터디 둘러보기</h1>
+            <p class="subtitle">
+                누구나 신청할 수 있는 공개 스터디입니다. 검색과 필터를 이용해 원하는 스터디를 찾아보세요.
+            </p>
 
-        <!-- 로그인 X -->
-        <a th:if="${!loggedIn}" href="/login" class="link-btn">로그인</a>
-        <a th:if="${!loggedIn}" href="/signup" class="link-btn secondary">회원가입</a>
-    </div>
-</header>
-<main>
-    <h1>공개 스터디 목록</h1>
-    <p>누구나 신청할 수 있는 공개 스터디입니다.</p>
+            <!-- 검색/필터 폼 -->
+            <form th:action="@{/studies}" method="get" class="search-filter">
+                <div class="search-row">
+                    <div class="form-field">
+                        <label for="keyword">검색어 (제목 / 소개)</label>
+                        <input type="text"
+                               id="keyword"
+                               name="keyword"
+                               placeholder="예: 자바, 토익, 알고리즘"
+                               th:value="${keyword}">
+                    </div>
+                    <div class="form-field">
+                        <label for="category">카테고리</label>
+                        <input type="text"
+                               id="category"
+                               name="category"
+                               placeholder="예: 프로그래밍, 어학"
+                               th:value="${category}">
+                    </div>
+                    <div class="form-field">
+                        <label for="sort">정렬</label>
+                        <select id="sort" name="sort" th:value="${sort}">
+                            <option value="latest">최신순</option>
+                            <option value="oldest">오래된순</option>
+                            <option value="title">제목순</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="search-actions">
+                    <button type="submit" class="btn-primary">검색</button>
+                    <a th:href="@{/studies}" class="btn-secondary">초기화</a>
+                </div>
+            </form>
 
-    <div class="actions">
-        <a href="/my/studies/new" class="primary-btn">스터디 개설하기</a>
-    </div>
-
-    <div class="study-list">
-        <div th:if="${#lists.isEmpty(studies)}" class="empty">
-            현재 등록된 스터디가 없습니다. 첫 번째 스터디를 개설해 보세요!
-        </div>
-
-        <div th:each="study : ${studies}" class="study-card">
-            <h2 th:text="${study.title}">스터디 제목</h2>
-            <p th:text="${study.description}">스터디 소개</p>
-            <div class="meta">
-                <span th:text="'카테고리: ' + (${study.category} ?: '미지정')">카테고리</span>
-                <span th:text="'모집 인원: ' + ${study.maxMembers} + '명'">모집 인원</span>
+            <div class="actions">
+                <a href="/my/studies/new" class="btn-primary">스터디 개설하기</a>
             </div>
-            <a th:href="@{'/studies/' + ${study.id}}" class="detail-link">자세히 보기</a>
-        </div>
-    </div>
-</main>
+
+            <div class="study-list">
+                <div th:if="${#lists.isEmpty(studies)}" class="empty">
+                    현재 조건에 맞는 스터디가 없습니다. 검색 조건을 바꾸거나, 첫 번째 스터디를 개설해 보세요!
+                </div>
+
+                <div th:each="study : ${studies}" class="study-card">
+                    <div class="study-card-header">
+                        <h2 th:text="${study.title}">스터디 제목</h2>
+
+                        <!-- 로그인한 경우에만 참여 상태 뱃지 표시 -->
+                        <div th:if="${loggedIn}">
+                            <span th:switch="${joinStatusMap[study.id]}"
+                                  class="status-badge"
+                                  th:classappend="' ' +
+                                      (${joinStatusMap[study.id]} == 'JOINED' ? 'status-joined' :
+                                       (${joinStatusMap[study.id]} == 'PENDING' ? 'status-pending' : 'status-available'))">
+                                <span th:case="'JOINED'">참여중</span>
+                                <span th:case="'PENDING'">가입 대기중</span>
+                                <span th:case="*">신청 가능</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <p th:text="${study.description}">스터디 소개</p>
+
+                    <div class="meta">
+                        <span th:text="'카테고리: ' + (${study.category} ?: '미지정')">카테고리</span>
+                        <span th:text="'모집 인원: ' + ${study.maxMembers} + '명'">모집 인원</span>
+                        <span th:text="'모임 방식: ' + (${study.studyMode} ?: '미지정')">모임 방식</span>
+                        <span th:text="'장소: ' + (${study.location} ?: '미지정')">장소</span>
+                    </div>
+
+                    <div class="card-footer">
+                        <div class="card-footer-left">
+                            <!-- 필요하면 createdAt 등 요약 표시 가능 -->
+                        </div>
+                        <div class="card-footer-right">
+                            <a th:href="@{'/studies/' + ${study.id}}" class="detail-link">자세히 보기</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
 </body>
 </html>

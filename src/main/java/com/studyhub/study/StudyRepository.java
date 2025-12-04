@@ -12,4 +12,6 @@ public interface StudyRepository extends JpaRepository<Study, Long> {
 
     // 내가 리더인 스터디 목록
     List<Study> findByLeader(User leader);
+    
+    List<Study> findTop5ByIsPublicTrueOrderByCreatedAtDesc();
 }

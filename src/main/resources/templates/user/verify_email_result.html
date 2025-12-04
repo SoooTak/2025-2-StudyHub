@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>이메일 인증 · StudyHub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/studyhub.css}">
+</head>
+<body>
+
+<th:block th:replace="fragments/header :: header"></th:block>
+
+<main class="page-container">
+    <section class="card" th:if="${success}">
+        <h1 class="section-title">이메일 인증이 완료되었습니다.</h1>
+        <p class="muted">
+            이제 로그인할 수 있습니다.
+        </p>
+        <div style="margin-top:16px;">
+            <a th:href="@{/login}" class="btn-primary">로그인 하러가기</a>
+        </div>
+    </section>
+
+    <section class="card" th:if="${!success}">
+        <h1 class="section-title">이메일 인증에 실패했습니다.</h1>
+        <p class="muted">
+            링크가 만료되었거나 잘못된 토큰입니다.<br>
+            다시 회원가입을 진행하거나, 관리자에게 문의해 주세요.
+        </p>
+        <div style="margin-top:16px;">
+            <a th:href="@{/login}" class="btn-secondary">로그인 페이지로</a>
+        </div>
+    </section>
+</main>
+
+</body>
+</html>

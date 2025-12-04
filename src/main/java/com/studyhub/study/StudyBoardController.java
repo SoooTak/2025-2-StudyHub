@@ -28,7 +28,7 @@ public class StudyBoardController {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final UserService userService;
-
+    private final NotificationService notificationService;
     // 게시판 목록 + 글쓰기 폼
     @GetMapping
     public String list(@PathVariable("studyId") Long studyId, Model model) {
@@ -133,6 +133,7 @@ public class StudyBoardController {
         post.setType(type);
 
         postRepository.save(post);
+        notificationService.createPostCreatedNotifications(study, post, currentUser);
 
         return "redirect:/room/" + studyId + "/board";
     }
@@ -359,6 +360,7 @@ public class StudyBoardController {
         comment.setContent(form.getContent());
 
         commentRepository.save(comment);
+        notificationService.createCommentCreatedNotification(study, post, currentUser);
 
         return "redirect:/room/" + studyId + "/board/" + postId;
     }

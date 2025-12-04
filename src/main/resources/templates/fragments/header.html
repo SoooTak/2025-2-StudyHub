@@ -1,0 +1,41 @@
+<!-- templates/fragments/header.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<header th:fragment="header">
+    <div class="topbar">
+        <div class="topbar-left">
+            <!-- 🔹 로고: 항상 메인으로 이동 (about:blank#blocked 해결) -->
+            <a class="topbar-logo" th:href="@{/}">StudyHub</a>
+
+            <!-- 🔹 상단 메뉴 -->
+            <nav>
+                <a th:href="@{/studies}">스터디 둘러보기</a>
+                <a th:href="@{/my/studies}">내 스터디</a>
+            </nav>
+        </div>
+
+        <!-- 로그인 상태일 때 우측 영역 -->
+        <div class="topbar-right" th:if="${loggedIn}">
+            <!-- 알림 아이콘 + 뱃지 -->
+            <a th:href="@{/notifications}" class="notif-icon">
+                🔔
+                <span class="notif-badge"
+                      th:if="${unreadNotificationCount != null and unreadNotificationCount > 0}"
+                      th:text="${unreadNotificationCount}">0</span>
+            </a>
+
+            <span class="user-email" th:text="${loginEmail}">user@example.com</span>
+            <a th:href="@{/my/profile}" class="auth-link">마이페이지</a>
+            <a th:href="@{/logout}" class="auth-link">로그아웃</a>
+        </div>
+
+        <!-- 비로그인 상태일 때 우측 영역 -->
+        <div class="topbar-right" th:if="${!loggedIn}">
+            <a th:href="@{/login}" class="auth-link">로그인</a>
+            <a th:href="@{/signup}" class="signup-btn">회원가입</a>
+        </div>
+    </div>
+</header>
+</body>
+</html>

@@ -4,65 +4,15 @@
     <meta charset="UTF-8">
     <title>내 스터디 - StudyHub</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 공통 테마 -->
+    <link rel="stylesheet" th:href="@{/css/studyhub.css}">
+
+    <!-- 이 페이지 전용 스타일 -->
     <style>
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f7fb;
-        }
-
-        header {
-            background-color: #2b4cff;
-            color: #ffffff;
-            padding: 12px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .brand {
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-
-        .link-btn,
-        .link-button {
-            display: inline-block;
-            padding: 6px 10px;
-            border-radius: 999px;
-            border: 1px solid #ffffff;
-            background: transparent;
-            color: #ffffff;
-            font-size: 13px;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .link-btn.secondary {
-            border-color: #d0dcff;
-            background-color: #ffffff;
-            color: #2b4cff;
-        }
-
-        .link-btn:hover,
-        .link-button:hover {
-            opacity: 0.9;
-        }
-
-        main {
+        .mystudies-main {
             max-width: 960px;
-            margin: 32px auto;
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            margin: 24px auto 32px;
             padding: 24px 28px;
         }
 
@@ -74,7 +24,7 @@
         .description {
             margin-top: 4px;
             font-size: 14px;
-            color: #666;
+            color: var(--color-text-muted);
         }
 
         .section-title {
@@ -91,9 +41,11 @@
         }
 
         .study-card {
-            border-radius: 10px;
-            border: 1px solid #e0e4f0;
+            border-radius: 12px;
+            border: 1px solid var(--color-border-subtle);
+            background-color: var(--color-surface);
             padding: 14px 16px;
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04);
         }
 
         .study-card h2 {
@@ -103,14 +55,14 @@
 
         .study-card p {
             margin: 4px 0;
-            color: #555;
+            color: #4b5563;
             font-size: 14px;
         }
 
         .meta {
             margin-top: 6px;
             font-size: 12px;
-            color: #777;
+            color: var(--color-text-muted);
         }
 
         .meta span {
@@ -124,7 +76,7 @@
 
         .links a {
             margin-right: 10px;
-            color: #2b4cff;
+            color: var(--color-primary);
             text-decoration: none;
         }
 
@@ -135,87 +87,104 @@
         .empty {
             margin-top: 8px;
             font-size: 14px;
-            color: #777;
+            color: var(--color-text-muted);
+        }
+
+        .top-actions {
+            margin-top: 16px;
+            text-align: right;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: none;
+            background-color: var(--color-primary);
+            color: #ffffff;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--color-primary-strong);
         }
     </style>
 </head>
 <body>
-<header>
-    <div class="brand">
-        <a href="/" style="color: #ffffff; text-decoration: none;">StudyHub</a>
-    </div>
-    <div class="nav-right">
-        <a href="/studies" class="link-btn secondary">스터디 탐색</a>
-        <a href="/my/studies" class="link-btn">내 스터디</a>
+    <!-- 공통 헤더 (흰색 topbar) -->
+    <th:block th:replace="fragments/header :: header"></th:block>
 
-        <span th:if="${loggedIn}" th:text="${loginEmail} + ' 님'">user@example.com 님</span>
-        <form th:if="${loggedIn}" th:action="@{/logout}" method="post" style="margin: 0;">
-            <button type="submit" class="link-button">로그아웃</button>
-        </form>
+    <div class="page-container">
+        <main class="mystudies-main">
+            <h1>내 스터디</h1>
+            <p class="description">
+                내가 리더(개설자)인 스터디와, 멤버/매니저로 참여 중인 스터디를 한 번에 볼 수 있습니다.
+            </p>
 
-        <a th:if="${!loggedIn}" href="/login" class="link-btn">로그인</a>
-        <a th:if="${!loggedIn}" href="/signup" class="link-btn secondary">회원가입</a>
-    </div>
-</header>
-<main>
-    <h1>내 스터디</h1>
-    <p class="description">
-        내가 리더(개설자)인 스터디와, 멤버/매니저로 참여 중인 스터디를 한 번에 볼 수 있습니다.
-    </p>
-
-    <!-- 내가 리더인 스터디 -->
-    <div class="section-title">내가 리더인 스터디</div>
-    <div class="study-list">
-        <div th:if="${#lists.isEmpty(leaderStudies)}" class="empty">
-            내가 리더인 스터디가 없습니다.
-            <br>
-            <a href="/my/studies/new" style="color: #2b4cff; text-decoration: none; font-weight: 600;">
-                → 스터디 개설하러 가기
-            </a>
-        </div>
-
-        <div th:each="study : ${leaderStudies}" class="study-card">
-            <h2 th:text="${study.title}">스터디 제목</h2>
-            <p th:text="${study.description}">스터디 소개</p>
-            <div class="meta">
-                <span th:text="'카테고리: ' + (${study.category} ?: '미지정')">카테고리</span>
-                <span th:text="'모집 인원: ' + ${study.maxMembers} + '명'">모집 인원</span>
-                <span th:text="'공개 여부: ' + (${study.public} ? '공개' : '비공개')">공개 여부</span>
+            <div class="top-actions">
+                <a th:href="@{/my/studies/new}" class="btn-primary">새 스터디 개설하기</a>
             </div>
-            <div class="links">
-                <a th:href="@{'/room/' + ${study.id}}">스터디 홈 들어가기</a>
-                <a th:href="@{'/studies/' + ${study.id}}">스터디 상세 보기</a>
-                <a th:href="@{'/my/studies/' + ${study.id} + '/applications'}">가입 신청 관리</a>
-                <a th:href="@{'/my/studies/' + ${study.id} + '/edit'}">스터디 정보 수정</a>
-            </div>
-        </div>
-    </div>
 
-    <!-- 내가 멤버/매니저로 참여 중인 스터디 -->
-    <div class="section-title">내가 멤버/매니저로 참여 중인 스터디</div>
-    <div class="study-list">
-        <div th:if="${#lists.isEmpty(joinedMemberships)}" class="empty">
-            아직 다른 스터디에 멤버/매니저로 참여 중이 아닙니다.
-            <br>
-            <a href="/studies" style="color: #2b4cff; text-decoration: none; font-weight: 600;">
-                → 공개 스터디 둘러보기
-            </a>
-        </div>
+            <!-- 내가 리더인 스터디 -->
+            <div class="section-title">내가 리더인 스터디</div>
+            <div class="study-list">
+                <div th:if="${#lists.isEmpty(leaderStudies)}" class="empty">
+                    내가 리더인 스터디가 없습니다.
+                    <br>
+                    <a th:href="@{/my/studies/new}"
+                       style="color: var(--color-primary); text-decoration: none; font-weight: 600;">
+                        → 스터디 개설하러 가기
+                    </a>
+                </div>
 
-        <div th:each="membership : ${joinedMemberships}" class="study-card">
-            <h2 th:text="${membership.study.title}">스터디 제목</h2>
-            <p th:text="${membership.study.description}">스터디 소개</p>
-            <div class="meta">
-                <span th:text="'카테고리: ' + (${membership.study.category} ?: '미지정')">카테고리</span>
-                <span th:text="'모집 인원: ' + ${membership.study.maxMembers} + '명'">모집 인원</span>
-                <span th:text="'공개 여부: ' + (${membership.study.public} ? '공개' : '비공개')">공개 여부</span>
+                <div th:each="study : ${leaderStudies}" class="study-card">
+                    <h2 th:text="${study.title}">스터디 제목</h2>
+                    <p th:text="${study.description}">스터디 소개</p>
+                    <div class="meta">
+                        <span th:text="'카테고리: ' + (${study.category} ?: '미지정')">카테고리</span>
+                        <span th:text="'모집 인원: ' + ${study.maxMembers} + '명'">모집 인원</span>
+                        <span th:text="'공개 여부: ' + (${study.public} ? '공개' : '비공개')">공개 여부</span>
+                    </div>
+                    <div class="links">
+                        <a th:href="@{'/room/' + ${study.id}}">스터디 홈</a>
+                        <a th:href="@{'/studies/' + ${study.id}}">스터디 상세 보기</a>
+                        <a th:href="@{'/my/studies/' + ${study.id} + '/applications'}">가입 신청 관리</a>
+                        <a th:href="@{'/my/studies/' + ${study.id} + '/edit'}">스터디 정보 수정</a>
+                    </div>
+                </div>
             </div>
-            <div class="links">
-                <a th:href="@{'/room/' + ${membership.study.id}}">스터디 홈 들어가기</a>
-                <a th:href="@{'/studies/' + ${membership.study.id}}">스터디 상세 보기</a>
+
+            <!-- 내가 멤버/매니저로 참여 중인 스터디 -->
+            <div class="section-title">내가 멤버/매니저로 참여 중인 스터디</div>
+            <div class="study-list">
+                <div th:if="${#lists.isEmpty(joinedMemberships)}" class="empty">
+                    아직 다른 스터디에 멤버/매니저로 참여 중이 아닙니다.
+                    <br>
+                    <a th:href="@{/studies}"
+                       style="color: var(--color-primary); text-decoration: none; font-weight: 600;">
+                        → 공개 스터디 둘러보기
+                    </a>
+                </div>
+
+                <div th:each="membership : ${joinedMemberships}" class="study-card">
+                    <h2 th:text="${membership.study.title}">스터디 제목</h2>
+                    <p th:text="${membership.study.description}">스터디 소개</p>
+                    <div class="meta">
+                        <span th:text="'카테고리: ' + (${membership.study.category} ?: '미지정')">카테고리</span>
+                        <span th:text="'모집 인원: ' + ${membership.study.maxMembers} + '명'">모집 인원</span>
+                        <span th:text="'공개 여부: ' + (${membership.study.public} ? '공개' : '비공개')">공개 여부</span>
+                    </div>
+                    <div class="links">
+                        <a th:href="@{'/room/' + ${membership.study.id}}">스터디 홈</a>
+                        <a th:href="@{'/studies/' + ${membership.study.id}}">스터디 상세 보기</a>
+                    </div>
+                </div>
             </div>
-        </div>
+        </main>
     </div>
-</main>
 </body>
 </html>

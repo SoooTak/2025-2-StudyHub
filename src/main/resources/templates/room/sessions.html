@@ -4,126 +4,61 @@
     <meta charset="UTF-8">
     <title th:text="${study.title} + ' - 출석 / 일정 - StudyHub'">출석 / 일정 - StudyHub</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 전역 화이트 테마 -->
+    <link rel="stylesheet" th:href="@{/css/studyhub.css}">
+
+    <!-- 이 페이지 전용 스타일 -->
     <style>
-        * {
-            box-sizing: border-box;
-        }
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f7fb;
-        }
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-        header {
-            background-color: #1f3b8f;
-            color: #ffffff;
-            padding: 12px 20px;
-        }
-        .header-inner {
-            max-width: 1040px;
-            margin: 0 auto;
+        .attendance-main {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .logo {
-            font-weight: 700;
-            font-size: 20px;
-        }
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 14px;
-        }
-        .nav-links a {
-            padding: 6px 10px;
-            border-radius: 999px;
-        }
-        .nav-links a:hover {
-            background-color: rgba(255, 255, 255, 0.16);
-        }
-        .login-email {
-            font-size: 13px;
-            opacity: 0.9;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        main {
-            max-width: 1040px;
-            margin: 24px auto;
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-            padding: 22px 26px 28px;
-        }
-        h1 {
-            margin: 0;
-            font-size: 22px;
-        }
         .meta {
-            margin-top: 8px;
+            margin-top: 4px;
             font-size: 13px;
-            color: #666;
+            color: var(--color-text-muted);
         }
         .meta span {
             margin-right: 12px;
         }
 
-        /* 출석 요약 카드 */
-        .summary-card {
-            margin-top: 18px;
-            padding: 14px 16px;
-            border-radius: 10px;
-            border: 1px solid #d8e1ff;
-            background-color: #eef3ff;
-        }
-        .summary-title {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-        .summary-items {
+        /* 출석 요약 카드 내부 */
+        .summary-card-inner {
             display: flex;
             flex-wrap: wrap;
             gap: 16px 32px;
-            font-size: 13px;
+            margin-top: 8px;
         }
         .summary-item {
-            display: flex;
-            flex-direction: column;
+            min-width: 120px;
         }
         .summary-label {
-            color: #555;
+            font-size: 13px;
+            color: var(--color-text-muted);
             margin-bottom: 2px;
         }
         .summary-value {
+            font-size: 20px;
             font-weight: 700;
-            font-size: 18px;
-        }
-
-        .section-title {
-            margin-top: 24px;
-            font-size: 18px;
-            font-weight: 600;
         }
 
         .session-list {
-            margin-top: 10px;
+            margin-top: 8px;
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
 
         .session-card {
-            border-radius: 10px;
-            border: 1px solid #e0e4f0;
+            border-radius: 12px;
+            border: 1px solid var(--color-border-subtle);
+            background-color: var(--color-surface);
             padding: 12px 14px;
             font-size: 14px;
-            background-color: #fafbff;
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
             display: flex;
             flex-direction: column;
             gap: 6px;
@@ -133,6 +68,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 8px;
         }
 
         .session-title {
@@ -141,7 +77,7 @@
 
         .session-info {
             font-size: 13px;
-            color: #555;
+            color: var(--color-text-muted);
         }
         .session-info div {
             margin-top: 2px;
@@ -161,17 +97,19 @@
             padding: 4px 10px;
             border-radius: 999px;
             font-size: 12px;
-            border: 1px solid #d0d7ec;
+            border: 1px solid var(--color-border-subtle);
+            background-color: #f9fafb;
+            color: var(--color-text-muted);
         }
         .status-ok {
-            background-color: #e6f6ec;
-            border-color: #8ad1a0;
-            color: #1c7c3a;
+            background-color: #ecfdf3;
+            border-color: #bbf7d0;
+            color: #166534;
         }
         .status-empty {
-            background-color: #fdf4e6;
-            border-color: #f0c27b;
-            color: #b07219;
+            background-color: #fef9c3;
+            border-color: #facc15;
+            color: #854d0e;
         }
 
         .btn {
@@ -183,21 +121,22 @@
             border: none;
             cursor: pointer;
             font-size: 13px;
+            text-decoration: none;
         }
         .btn-primary {
-            background-color: #1f3b8f;
+            background-color: var(--color-primary);
             color: #ffffff;
         }
         .btn-primary:hover {
-            background-color: #182f72;
+            background-color: var(--color-primary-strong);
         }
         .btn-secondary {
             background-color: #ffffff;
-            color: #1f3b8f;
-            border: 1px solid #c6cfeb;
+            color: var(--color-primary);
+            border: 1px solid var(--color-border-subtle);
         }
         .btn-secondary:hover {
-            background-color: #f5f7ff;
+            border-color: var(--color-primary);
         }
         .btn-small {
             font-size: 12px;
@@ -207,19 +146,10 @@
         .empty {
             padding: 10px 0;
             font-size: 14px;
-            color: #777;
+            color: var(--color-text-muted);
         }
 
-        .form-card {
-            margin-top: 28px;
-            padding-top: 18px;
-            border-top: 1px dashed #d0d7ec;
-        }
-        .form-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
+        /* 세션 생성 폼 카드 */
         .session-form-row {
             display: flex;
             flex-direction: column;
@@ -232,156 +162,171 @@
         }
         .session-form-row input {
             padding: 6px 8px;
-            border-radius: 6px;
-            border: 1px solid #cfd5e8;
+            border-radius: 8px;
+            border: 1px solid var(--color-border-subtle);
             font-size: 13px;
         }
         .session-form-row input:focus {
             outline: none;
-            border-color: #1f3b8f;
-            box-shadow: 0 0 0 1px rgba(31,59,143,0.12);
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.12);
         }
 
         .back-link {
             display: inline-block;
-            margin-top: 20px;
+            margin-top: 12px;
             font-size: 13px;
-            color: #1f3b8f;
+            color: var(--color-primary);
+            text-decoration: none;
         }
 
-        @media (max-width: 640px) {
-            main {
-                margin: 0;
-                border-radius: 0;
-            }
-            .header-inner {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 4px;
-            }
+        .back-link:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-<header>
-    <div class="header-inner">
-        <div class="logo">
-            <a href="/" style="color: #ffffff;">StudyHub</a>
-        </div>
-        <div class="nav-links">
-            <a href="/">홈</a>
-            <a href="/studies">스터디 탐색</a>
-            <span th:if="${loggedIn}" class="login-email" th:text="${loginEmail}">user@example.com</span>
-            <a th:if="${loggedIn}" href="/logout">로그아웃</a>
-            <a th:if="${!loggedIn}" href="/login">로그인</a>
-            <a th:if="${!loggedIn}" href="/signup">회원가입</a>
-        </div>
+
+<!-- 사이트 공통 헤더 -->
+<th:block th:replace="fragments/header :: header"></th:block>
+
+<!-- 스터디룸 상단 탭 (출석 탭 활성화) -->
+<header class="room-header">
+    <div style="display:flex;align-items:center;gap:14px;">
+        <a class="room-brand" th:href="@{|/room/${study.id}|}"
+           th:text="${study != null ? study.title : '스터디'}">스터디</a>
+        <nav class="room-nav">
+            <a th:href="@{|/room/${study.id}|}">홈</a>
+            <a class="active" th:href="@{|/room/${study.id}/sessions|}">출석</a>
+            <a th:href="@{|/room/${study.id}/board|}">게시판</a>
+            <a th:href="@{|/room/${study.id}/files|}">자료실</a>
+            <a th:href="@{|/room/${study.id}/members|}">멤버</a>
+        </nav>
+    </div>
+    <div class="room-header-right">
+        <span class="role-badge" th:if="${myRole != null}" th:text="${myRole}">MEMBER</span>
+        <a class="btn-secondary" th:href="@{/studies}">다른 스터디 둘러보기</a>
     </div>
 </header>
 
-<main>
-    <h1 th:text="${study.title} + ' - 출석 / 일정'">출석 / 일정</h1>
-    <div class="meta">
-        <span th:text="'카테고리: ' + (${study.category} ?: '미지정')">카테고리</span>
-        <span th:text="'진행 방식: ' + (${study.studyMode} ?: '미지정')">진행 방식</span>
-    </div>
+<main class="page-container">
+    <section class="attendance-main">
 
-    <!-- 출석 요약 -->
-    <div class="summary-card" th:if="${totalSessions > 0}">
-        <div class="summary-title">내 출석 요약</div>
-        <div class="summary-items">
-            <div class="summary-item">
-                <span class="summary-label">총 세션 수</span>
-                <span class="summary-value" th:text="${totalSessions}">0</span>
+        <!-- 상단: 스터디 정보 + 내 출석 요약 -->
+        <section class="card">
+            <h2 class="section-title">출석 / 일정</h2>
+            <div class="meta">
+                <span th:text="'카테고리: ' + (${study.category} ?: '미지정')">카테고리</span>
+                <span th:text="'진행 방식: ' + (${study.studyMode} ?: '미지정')">진행 방식</span>
             </div>
-            <div class="summary-item">
-                <span class="summary-label">출석한 세션</span>
-                <span class="summary-value" th:text="${attendedSessions}">0</span>
-            </div>
-            <div class="summary-item">
-                <span class="summary-label">출석률</span>
-                <span class="summary-value" th:text="${attendanceRate} + '%'">0%</span>
-            </div>
-        </div>
-    </div>
-    <div class="summary-card" th:if="${totalSessions == 0}">
-        아직 등록된 세션이 없어 출석 요약을 계산할 수 없습니다.
-    </div>
 
-    <div class="section-title">세션 목록</div>
-
-    <div class="session-list">
-        <div th:if="${#lists.isEmpty(sessions)}" class="empty">
-            아직 등록된 세션이 없습니다.
-        </div>
-
-        <div th:each="sess : ${sessions}" class="session-card"
-             th:with="status=${myStatusMap[sess.id]}">
-            <div class="session-header">
-                <div class="session-title" th:text="${sess.title}">세션 제목</div>
-            </div>
-            <div class="session-info">
-                <div>
-                    <span>일시: </span>
-                    <span th:text="${#temporals.format(sess.sessionDateTime, 'yyyy-MM-dd HH:mm')}">
-                        2025-12-03 19:00
-                    </span>
+            <!-- 출석 요약 -->
+            <div class="summary-card" style="margin-top:16px;">
+                <div th:if="${totalSessions > 0}">
+                    <div class="section-title" style="font-size:15px; margin-top:0;">내 출석 요약</div>
+                    <div class="summary-card-inner">
+                        <div class="summary-item">
+                            <div class="summary-label">총 세션 수</div>
+                            <div class="summary-value" th:text="${totalSessions}">0</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">출석한 세션</div>
+                            <div class="summary-value" th:text="${attendedSessions}">0</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">출석률</div>
+                            <div class="summary-value" th:text="${attendanceRate} + '%'">0%</div>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <span>장소: </span>
-                    <span th:text="${sess.location ?: '미지정'}">장소</span>
+                <div th:if="${totalSessions == 0}" class="muted">
+                    아직 등록된 세션이 없어 출석 요약을 계산할 수 없습니다.
                 </div>
             </div>
-            <div class="session-actions">
-                <div class="status-pill"
-                     th:classappend="${status != null} ? ' status-ok' : ' status-empty'"
-                     th:text="${status != null} ? '출석 완료' : '미출석'">
-                    미출석
+        </section>
+
+        <!-- 세션 목록 카드 -->
+        <section class="card">
+            <h3 class="section-title" style="margin-top:0;">세션 목록</h3>
+
+            <div class="session-list">
+                <div th:if="${#lists.isEmpty(sessions)}" class="empty">
+                    아직 등록된 세션이 없습니다.
                 </div>
 
-                <!-- 출석 체크 버튼: 아직 출석하지 않은 경우에만 -->
-                <form th:if="${status == null}"
-                      th:action="@{'/room/' + ${study.id} + '/sessions/' + ${sess.id} + '/checkin'}"
-                      method="post">
-                    <button type="submit" class="btn btn-primary btn-small">출석 체크</button>
-                </form>
-                <div th:if="${status != null}" style="font-size: 12px; color: #555;">
-                    이미 출석 처리되었습니다.
+                <div th:each="sess : ${sessions}" class="session-card"
+                     th:with="status=${myStatusMap[sess.id]}">
+
+                    <div class="session-header">
+                        <div class="session-title" th:text="${sess.title}">세션 제목</div>
+                    </div>
+
+                    <div class="session-info">
+                        <div>
+                            <span>일시: </span>
+                            <span th:text="${#temporals.format(sess.sessionDateTime, 'yyyy-MM-dd HH:mm')}">
+                                2025-12-03 19:00
+                            </span>
+                        </div>
+                        <div>
+                            <span>장소: </span>
+                            <span th:text="${sess.location ?: '미지정'}">장소</span>
+                        </div>
+                    </div>
+
+                    <div class="session-actions">
+                        <div class="status-pill"
+                             th:classappend="${status != null} ? ' status-ok' : ' status-empty'"
+                             th:text="${status != null} ? '출석 완료' : '미출석'">
+                            미출석
+                        </div>
+
+                        <!-- 출석 체크 버튼: 아직 출석하지 않은 경우에만 -->
+                        <form th:if="${status == null}"
+                              th:action="@{'/room/' + ${study.id} + '/sessions/' + ${sess.id} + '/checkin'}"
+                              method="post">
+                            <button type="submit" class="btn btn-primary btn-small">출석 체크</button>
+                        </form>
+                        <div th:if="${status != null}" style="font-size: 12px; color: var(--color-text-muted);">
+                            이미 출석 처리되었습니다.
+                        </div>
+
+                        <!-- 리더/매니저: 출석부 보기 -->
+                        <a th:if="${isLeader} or ${isManager}"
+                           th:href="@{'/room/' + ${study.id} + '/sessions/' + ${sess.id} + '/attendance'}"
+                           class="btn btn-secondary btn-small">
+                            출석부 보기
+                        </a>
+                    </div>
                 </div>
+            </div>
+        </section>
 
-                <!-- 리더 전용: 출석부 보기 -->
-                <a th:if="${isLeader}"
-                   th:href="@{'/room/' + ${study.id} + '/sessions/' + ${sess.id} + '/attendance'}"
-                   class="btn btn-secondary btn-small">
-                    출석부 보기
-                </a>
-            </div>
-        </div>
-    </div>
+        <!-- 리더만 세션 생성 -->
+        <section class="card" th:if="${isLeader}">
+            <h3 class="section-title" style="margin-top:0;">새 세션 추가</h3>
+            <form th:action="@{'/room/' + ${study.id} + '/sessions/new'}"
+                  method="post"
+                  th:object="${sessionForm}">
+                <div class="session-form-row">
+                    <label for="title">세션 제목</label>
+                    <input id="title" type="text" th:field="*{title}" placeholder="예) 1주차 OT" required>
+                </div>
+                <div class="session-form-row">
+                    <label for="sessionDateTime">일시</label>
+                    <input id="sessionDateTime" type="datetime-local" th:field="*{sessionDateTime}" required>
+                </div>
+                <div class="session-form-row">
+                    <label for="location">장소</label>
+                    <input id="location" type="text" th:field="*{location}" placeholder="예) 온라인, 학교 1공학관 101호">
+                </div>
+                <button type="submit" class="btn btn-primary">세션 추가</button>
+            </form>
+        </section>
 
-    <!-- 리더만 세션 생성 가능 -->
-    <div class="form-card" th:if="${isLeader}">
-        <div class="form-title">새 세션 추가</div>
-        <form th:action="@{'/room/' + ${study.id} + '/sessions/new'}"
-              method="post"
-              th:object="${sessionForm}">
-            <div class="session-form-row">
-                <label for="title">세션 제목</label>
-                <input id="title" type="text" th:field="*{title}" placeholder="예) 1주차 OT" required>
-            </div>
-            <div class="session-form-row">
-                <label for="sessionDateTime">일시</label>
-                <input id="sessionDateTime" type="datetime-local" th:field="*{sessionDateTime}" required>
-            </div>
-            <div class="session-form-row">
-                <label for="location">장소</label>
-                <input id="location" type="text" th:field="*{location}" placeholder="예) 온라인, 학교 1공학관 101호">
-            </div>
-            <button type="submit" class="btn btn-primary">세션 추가</button>
-        </form>
-    </div>
-
-    <a th:href="@{'/room/' + ${study.id}}" class="back-link">← 스터디 홈으로 돌아가기</a>
+        <a th:href="@{'/room/' + ${study.id}}" class="back-link">← 스터디 홈으로 돌아가기</a>
+    </section>
 </main>
+
 </body>
 </html>

@@ -4,86 +4,32 @@
     <meta charset="UTF-8">
     <title th:text="${study.title} + ' - 멤버 목록 - StudyHub'">멤버 목록 - StudyHub</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        * { box-sizing: border-box; }
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f7fb;
-        }
-        a { text-decoration: none; color: inherit; }
 
-        header {
-            background-color: #1f3b8f;
-            color: #ffffff;
-            padding: 12px 20px;
-        }
-        .header-inner {
+    <!-- 전역 화이트 테마 -->
+    <link rel="stylesheet" th:href="@{/css/studyhub.css}">
+
+    <!-- 이 페이지 전용 스타일 -->
+    <style>
+        .members-main {
             max-width: 1040px;
             margin: 0 auto;
+        }
+
+        .members-header-info {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .logo { font-weight: 700; font-size: 20px; }
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 14px;
-        }
-        .nav-links a {
-            padding: 6px 10px;
-            border-radius: 999px;
-        }
-        .nav-links a:hover {
-            background-color: rgba(255, 255, 255, 0.16);
-        }
-        .login-email {
-            font-size: 13px;
-            opacity: 0.9;
+            flex-direction: column;
+            gap: 8px;
         }
 
-        main {
-            max-width: 1040px;
-            margin: 24px auto;
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-            padding: 22px 26px 26px;
-        }
-        h1 { margin: 0; font-size: 22px; }
-
-        .top-actions {
-            margin-top: 10px;
-            margin-bottom: 12px;
-        }
-
-        .btn {
+        .my-role-pill {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            padding: 6px 12px;
-            border-radius: 999px;
-            border: none;
-            cursor: pointer;
-            font-size: 13px;
-        }
-        .btn-secondary {
-            background-color: #ffffff;
-            color: #1f3b8f;
-            border: 1px solid #c6cfeb;
-        }
-
-        .role-badge {
-            display: inline-block;
-            margin-top: 8px;
             padding: 4px 10px;
             border-radius: 999px;
             font-size: 12px;
-            background-color: #eef1ff;
-            color: #1f3b8f;
+            background-color: var(--color-primary-soft);
+            color: var(--color-primary);
+            margin-top: 6px;
         }
 
         table {
@@ -93,21 +39,21 @@
             font-size: 14px;
         }
         thead {
-            background-color: #f5f7ff;
+            background-color: #eff6ff;
         }
         th, td {
             padding: 8px 10px;
-            border-bottom: 1px solid #e1e4f0;
+            border-bottom: 1px solid var(--color-border-subtle);
             text-align: left;
             vertical-align: middle;
         }
         th {
             font-weight: 600;
             font-size: 13px;
-            color: #444;
+            color: var(--color-text-main);
         }
         tbody tr:hover {
-            background-color: #fafbff;
+            background-color: #f9fafb;
         }
 
         .role-pill {
@@ -117,21 +63,21 @@
             font-size: 12px;
         }
         .role-leader {
-            background-color: #ffe8e0;
-            color: #b03a14;
+            background-color: #fee2e2;
+            color: #b91c1c;
         }
         .role-manager {
-            background-color: #e4f5ff;
-            color: #145a9c;
+            background-color: #dbeafe;
+            color: #1d4ed8;
         }
         .role-member {
-            background-color: #edf0f7;
-            color: #444;
+            background-color: #e5e7eb;
+            color: #374151;
         }
 
         .self-label {
             font-size: 11px;
-            color: #888;
+            color: var(--color-text-muted);
             margin-left: 4px;
         }
 
@@ -148,38 +94,30 @@
             cursor: pointer;
         }
         .action-promote {
-            background-color: #e4f0ff;
-            color: #163f8f;
+            background-color: #e0ecff;
+            color: #1d4ed8;
         }
         .action-demote {
-            background-color: #fff4e0;
-            color: #975716;
+            background-color: #fef3c7;
+            color: #92400e;
         }
         .action-remove {
-            background-color: #ffe8e6;
-            color: #a22024;
+            background-color: #fee2e2;
+            color: #b91c1c;
         }
         .action-leave {
-            background-color: #ffe8f6;
-            color: #a0206a;
+            background-color: #fce7f3;
+            color: #be185d;
         }
 
         .info-text {
-            margin-top: 10px;
+            margin-top: 12px;
             font-size: 12px;
-            color: #777;
+            color: var(--color-text-muted);
+            line-height: 1.5;
         }
 
         @media (max-width: 640px) {
-            main {
-                margin: 0;
-                border-radius: 0;
-            }
-            .header-inner {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 4px;
-            }
             table, thead, tbody, th, td, tr {
                 display: block;
             }
@@ -187,7 +125,7 @@
                 display: none;
             }
             tbody tr {
-                border-bottom: 1px solid #e1e4f0;
+                border-bottom: 1px solid var(--color-border-subtle);
                 padding: 8px 0;
             }
             td {
@@ -200,7 +138,7 @@
                 min-width: 80px;
                 font-weight: 600;
                 font-size: 12px;
-                color: #555;
+                color: var(--color-text-muted);
                 margin-right: 6px;
             }
         }
@@ -217,117 +155,119 @@
     </script>
 </head>
 <body>
-<header>
-    <div class="header-inner">
-        <div class="logo">
-            <a href="/" style="color:#ffffff;">StudyHub</a>
-        </div>
-        <div class="nav-links">
-            <a href="/">홈</a>
-            <a href="/studies">스터디 탐색</a>
-            <span th:if="${loggedIn}" class="login-email" th:text="${loginEmail}">user@example.com</span>
-            <a th:if="${loggedIn}" href="/logout">로그아웃</a>
-            <a th:if="${!loggedIn}" href="/login">로그인</a>
-            <a th:if="${!loggedIn}" href="/signup">회원가입</a>
-        </div>
+
+<!-- 사이트 공통 헤더 -->
+<th:block th:replace="fragments/header :: header"></th:block>
+
+<!-- 스터디룸 상단 탭 (멤버 탭 활성화) -->
+<header class="room-header">
+    <div style="display:flex;align-items:center;gap:14px;">
+        <a class="room-brand" th:href="@{|/room/${study.id}|}"
+           th:text="${study != null ? study.title : '스터디'}">스터디</a>
+        <nav class="room-nav">
+            <a th:href="@{|/room/${study.id}|}">홈</a>
+            <a th:href="@{|/room/${study.id}/sessions|}">출석</a>
+            <a th:href="@{|/room/${study.id}/board|}">게시판</a>
+            <a th:href="@{|/room/${study.id}/files|}">자료실</a>
+            <a class="active" th:href="@{|/room/${study.id}/members|}">멤버</a>
+        </nav>
+    </div>
+    <div class="room-header-right">
+        <span class="role-badge" th:if="${myRole != null}" th:text="${myRole}">MEMBER</span>
+        <a class="btn-secondary" th:href="@{/studies}">다른 스터디 둘러보기</a>
     </div>
 </header>
 
-<main>
-    <h1 th:text="${study.title} + ' - 멤버 목록'">멤버 목록</h1>
+<main class="page-container">
+    <section class="card members-main">
+        <div class="members-header-info">
+            <h2 class="section-title" th:text="${study.title} + ' - 멤버 목록'">멤버 목록</h2>
+            <div class="my-role-pill"
+                 th:text="${isLeader} ? '내 역할: 리더(개설자)' :
+                          (${isLeaderOrManager} ? '내 역할: 매니저(부리더)' : '내 역할: 멤버')">
+                내 역할
+            </div>
+        </div>
 
-    <div class="top-actions">
-        <a th:href="@{'/room/' + ${study.id}}"
-           class="btn btn-secondary">← 스터디 홈</a>
-        <a th:href="@{'/room/' + ${study.id} + '/board'}"
-           class="btn btn-secondary" style="margin-left:6px;">게시글 목록</a>
-        <a th:href="@{'/room/' + ${study.id} + '/sessions'}"
-           class="btn btn-secondary" style="margin-left:6px;">출석 / 일정</a>
-    </div>
+        <table>
+            <thead>
+            <tr>
+                <th>닉네임</th>
+                <th>이메일</th>
+                <th>역할</th>
+                <th>관리</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(memberships)}">
+                <td colspan="4">아직 가입된 멤버가 없습니다.</td>
+            </tr>
+            <tr th:each="m : ${memberships}">
+                <td data-label="닉네임">
+                    <span th:text="${m.user.nickname}">닉네임</span>
+                    <span th:if="${m.user.id == currentUserId}" class="self-label">(나)</span>
+                </td>
+                <td data-label="이메일"
+                    th:text="${m.user.email}">email@example.com</td>
+                <td data-label="역할">
+                    <span th:switch="${m.role.name()}">
+                        <span th:case="'LEADER'" class="role-pill role-leader">리더</span>
+                        <span th:case="'MANAGER'" class="role-pill role-manager">매니저</span>
+                        <span th:case="'MEMBER'" class="role-pill role-member">멤버</span>
+                        <span th:case="*"
+                              class="role-pill role-member"
+                              th:text="${m.role}">기타</span>
+                    </span>
+                </td>
+                <td data-label="관리">
+                    <!-- 리더/매니저/관리자 → 다른 사람 관리 (리더 제외, 자기 자신 제외) -->
+                    <div class="actions"
+                         th:if="${(isLeaderOrManager or isAdmin)
+                                  and m.role.name() != 'LEADER'
+                                  and m.user.id != currentUserId}">
+                        <!-- 리더/관리자: 역할 변경 버튼 -->
+                        <form th:if="${(isLeader or isAdmin) and m.role.name() == 'MEMBER'}"
+                              th:action="@{'/room/' + ${study.id} + '/members/' + ${m.id} + '/promote'}"
+                              method="post">
+                            <button type="submit" class="action-btn action-promote">매니저로 지정</button>
+                        </form>
+                        <form th:if="${(isLeader or isAdmin) and m.role.name() == 'MANAGER'}"
+                              th:action="@{'/room/' + ${study.id} + '/members/' + ${m.id} + '/demote'}"
+                              method="post">
+                            <button type="submit" class="action-btn action-demote">일반 멤버로 변경</button>
+                        </form>
 
-    <div class="role-badge"
-         th:text="${isLeader} ? '내 역할: 리더(개설자)' :
-                  (${isLeaderOrManager} ? '내 역할: 매니저(부리더)' : '내 역할: 멤버')">
-        내 역할
-    </div>
+                        <!-- 강퇴 버튼 (리더/관리자: 리더 제외 모두, 매니저: 멤버만) -->
+                        <form th:if="${isLeader or isAdmin or ( !isLeader and isLeaderOrManager and m.role.name() == 'MEMBER')}"
+                              th:action="@{'/room/' + ${study.id} + '/members/' + ${m.id} + '/remove'}"
+                              method="post"
+                              onsubmit="return confirmRemoveMember();">
+                            <button type="submit" class="action-btn action-remove">강퇴</button>
+                        </form>
+                    </div>
 
-    <table>
-        <thead>
-        <tr>
-            <th>닉네임</th>
-            <th>이메일</th>
-            <th>역할</th>
-            <th>관리</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:if="${#lists.isEmpty(memberships)}">
-            <td colspan="4">아직 가입된 멤버가 없습니다.</td>
-        </tr>
-        <tr th:each="m : ${memberships}">
-            <td data-label="닉네임">
-                <span th:text="${m.user.nickname}">닉네임</span>
-                <span th:if="${m.user.id == currentUserId}" class="self-label">(나)</span>
-            </td>
-            <td data-label="이메일"
-                th:text="${m.user.email}">email@example.com</td>
-            <td data-label="역할">
-                <span th:switch="${m.role.name()}">
-                    <span th:case="'LEADER'" class="role-pill role-leader">리더</span>
-                    <span th:case="'MANAGER'" class="role-pill role-manager">매니저</span>
-                    <span th:case="'MEMBER'" class="role-pill role-member">멤버</span>
-                    <span th:case="*"
-                          class="role-pill role-member"
-                          th:text="${m.role}">기타</span>
-                </span>
-            </td>
-            <td data-label="관리">
-                <!-- 리더/매니저/관리자 → 다른 사람 관리 (리더 제외, 자기 자신 제외) -->
-                <div class="actions"
-                     th:if="${(isLeaderOrManager or isAdmin)
-                              and m.role.name() != 'LEADER'
-                              and m.user.id != currentUserId}">
-                    <!-- 리더/관리자: 역할 변경 버튼 -->
-                    <form th:if="${(isLeader or isAdmin) and m.role.name() == 'MEMBER'}"
-                          th:action="@{'/room/' + ${study.id} + '/members/' + ${m.id} + '/promote'}"
-                          method="post">
-                        <button type="submit" class="action-btn action-promote">매니저로 지정</button>
-                    </form>
-                    <form th:if="${(isLeader or isAdmin) and m.role.name() == 'MANAGER'}"
-                          th:action="@{'/room/' + ${study.id} + '/members/' + ${m.id} + '/demote'}"
-                          method="post">
-                        <button type="submit" class="action-btn action-demote">일반 멤버로 변경</button>
-                    </form>
+                    <!-- 자기 자신 탈퇴 (리더는 탈퇴 버튼 없음) -->
+                    <div class="actions"
+                         th:if="${m.user.id == currentUserId and m.role.name() != 'LEADER'}">
+                        <form th:action="@{'/room/' + ${study.id} + '/members/leave'}"
+                              method="post"
+                              onsubmit="return confirmLeaveStudy();">
+                            <button type="submit" class="action-btn action-leave">스터디 탈퇴</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
-                    <!-- 강퇴 버튼 (리더/관리자: 리더 제외 모두, 매니저: 멤버만) -->
-                    <form th:if="${isLeader or isAdmin or ( !isLeader and isLeaderOrManager and m.role.name() == 'MEMBER')}"
-                          th:action="@{'/room/' + ${study.id} + '/members/' + ${m.id} + '/remove'}"
-                          method="post"
-                          onsubmit="return confirmRemoveMember();">
-                        <button type="submit" class="action-btn action-remove">강퇴</button>
-                    </form>
-                </div>
-
-                <!-- 자기 자신 탈퇴 (리더는 탈퇴 버튼 없음) -->
-                <div class="actions"
-                     th:if="${m.user.id == currentUserId and m.role.name() != 'LEADER'}">
-                    <form th:action="@{'/room/' + ${study.id} + '/members/leave'}"
-                          method="post"
-                          onsubmit="return confirmLeaveStudy();">
-                        <button type="submit" class="action-btn action-leave">스터디 탈퇴</button>
-                    </form>
-                </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
-    <div class="info-text">
-        ※ 리더와 관리자만 다른 멤버의 권한을 변경하거나 강퇴할 수 있습니다.<br>
-        &nbsp;&nbsp;- 리더 / 관리자: 일반 멤버 강퇴 가능, 리더는 대상 제외<br>
-        &nbsp;&nbsp;- 리더: 매니저 지정/해제 및 매니저 강퇴 가능<br>
-        &nbsp;&nbsp;- 멤버 / 매니저는 자신의 행에서 <strong>스터디 탈퇴</strong> 버튼으로 언제든지 나갈 수 있습니다.
-    </div>
+        <div class="info-text">
+            ※ 리더와 관리자만 다른 멤버의 권한을 변경하거나 강퇴할 수 있습니다.<br>
+            &nbsp;&nbsp;- 리더 / 관리자: 일반 멤버 강퇴 가능, 리더는 대상 제외<br>
+            &nbsp;&nbsp;- 리더: 매니저 지정/해제 및 매니저 강퇴 가능<br>
+            &nbsp;&nbsp;- 멤버 / 매니저는 자신의 행에서 <strong>스터디 탈퇴</strong> 버튼으로 언제든지 나갈 수 있습니다.
+        </div>
+    </section>
 </main>
+
 </body>
 </html>

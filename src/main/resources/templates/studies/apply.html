@@ -4,111 +4,116 @@
     <meta charset="UTF-8">
     <title>가입 신청 - StudyHub</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 전역 화이트 테마 -->
+    <link rel="stylesheet" th:href="@{/css/studyhub.css}">
+
     <style>
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f7fb;
-        }
-
-        header {
-            background-color: #2b4cff;
-            color: #ffffff;
-            padding: 16px 24px;
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        main {
+        .apply-wrapper {
             max-width: 640px;
-            margin: 32px auto;
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-            padding: 24px 28px;
+            margin: 0 auto;
         }
 
-        h1 {
-            margin-top: 0;
+        .apply-title {
             font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .study-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 15px;
         }
 
         .field {
             margin-bottom: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
-        label {
-            display: block;
-            font-size: 14px;
-            margin-bottom: 4px;
-            color: #333;
+        .field label {
+            font-size: 13px;
+            font-weight: 500;
         }
 
-        textarea {
+        .field textarea {
             width: 100%;
             box-sizing: border-box;
             padding: 8px 10px;
-            border-radius: 6px;
-            border: 1px solid #d0d5dd;
+            border-radius: 8px;
+            border: 1px solid var(--color-border-subtle);
             font-size: 14px;
             resize: vertical;
-            min-height: 100px;
+            min-height: 110px;
         }
 
-        button {
+        .field textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.15);
+        }
+
+        .submit-btn {
             width: 100%;
             padding: 10px 0;
-            border-radius: 8px;
+            border-radius: 999px;
             border: none;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            background-color: #2b4cff;
+            background-color: var(--color-primary);
             color: #ffffff;
+            margin-top: 4px;
         }
 
-        button:hover {
-            opacity: 0.9;
+        .submit-btn:hover {
+            background-color: var(--color-primary-strong);
         }
 
         .back-link {
             display: inline-block;
             margin-top: 12px;
             font-size: 13px;
-            color: #2b4cff;
+            color: var(--color-primary);
             text-decoration: none;
         }
 
         .back-link:hover {
             text-decoration: underline;
         }
-
-        .study-title {
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
     </style>
 </head>
 <body>
-<header>
-    StudyHub - 스터디 가입 신청
-</header>
-<main>
-    <h1>가입 신청</h1>
-    <div class="study-title" th:text="${study.title}">스터디 제목</div>
 
-    <form th:action="@{'/my/studies/' + ${study.id} + '/apply'}" th:object="${form}" method="post">
-        <div class="field">
-            <label for="message">자기소개 및 가입 이유</label>
-            <textarea id="message" th:field="*{message}"
-                      placeholder="어떤 이유로 이 스터디에 가입하고 싶은지, 관련 경험이나 각오 등을 적어주세요."></textarea>
-        </div>
+<!-- 사이트 공통 헤더 -->
+<th:block th:replace="fragments/header :: header"></th:block>
 
-        <button type="submit">가입 신청 보내기</button>
-    </form>
+<main class="page-container">
+    <section class="card apply-wrapper">
+        <h1 class="apply-title">가입 신청</h1>
+        <p class="muted">
+            리더가 가입 여부를 판단할 수 있도록 간단한 자기소개와 가입 이유를 적어 주세요.
+        </p>
 
-    <a th:href="@{'/studies/' + ${study.id}}" class="back-link">← 스터디 상세로 돌아가기</a>
+        <div class="study-title" th:text="${study.title}">스터디 제목</div>
+
+        <form th:action="@{'/my/studies/' + ${study.id} + '/apply'}"
+              th:object="${form}"
+              method="post">
+            <div class="field">
+                <label for="message">자기소개 및 가입 이유</label>
+                <textarea id="message" th:field="*{message}"
+                          placeholder="어떤 이유로 이 스터디에 가입하고 싶은지, 관련 경험이나 각오 등을 적어주세요."></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">가입 신청 보내기</button>
+        </form>
+
+        <a th:href="@{'/studies/' + ${study.id}}" class="back-link">← 스터디 상세로 돌아가기</a>
+    </section>
 </main>
+
 </body>
 </html>

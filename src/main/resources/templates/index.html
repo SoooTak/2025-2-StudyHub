@@ -1,143 +1,292 @@
+<!-- src/main/resources/templates/index.html -->
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${title}">StudyHub</title>
+    <title>StudyHub - 대시보드</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 공통 테마 -->
+    <link rel="stylesheet" th:href="@{/css/studyhub.css}">
+
+    <!-- 메인 대시보드 전용 스타일 -->
     <style>
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f7fb;
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+            gap: 20px;
         }
 
-        header {
-            background-color: #2b4cff;
-            color: #ffffff;
-            padding: 12px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .dashboard-card {
+            background-color: var(--color-surface);
+            border-radius: 16px;
+            box-shadow: var(--shadow-card);
+            padding: 20px 22px;
         }
 
-        .brand {
-            font-size: 20px;
+        .dashboard-title {
+            font-size: 18px;
             font-weight: 600;
+            margin-bottom: 4px;
         }
 
-        .nav-right {
+        .dashboard-sub {
+            font-size: 13px;
+            color: var(--color-text-muted);
+            margin-bottom: 12px;
+        }
+
+        .my-study-list {
             display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .my-study-item {
+            border-radius: 10px;
+            border: 1px solid var(--color-border-subtle);
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .my-study-header {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
             gap: 8px;
-            font-size: 14px;
         }
 
-        .nav-right span {
-            margin-right: 4px;
+        .my-study-title {
+            font-size: 15px;
+            font-weight: 500;
         }
 
-        .link-btn,
-        .link-button {
-            display: inline-block;
-            padding: 6px 10px;
+        .my-study-meta {
+            font-size: 12px;
+            color: var(--color-text-muted);
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .my-study-actions {
+            margin-top: 6px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
             border-radius: 999px;
-            border: 1px solid #ffffff;
-            background: transparent;
-            color: #ffffff;
-            font-size: 13px;
-            text-decoration: none;
+            border: none;
             cursor: pointer;
-        }
-
-        .link-btn.secondary {
-            border-color: #d0dcff;
-            background-color: #ffffff;
-            color: #2b4cff;
-        }
-
-        .link-btn:hover,
-        .link-button:hover {
-            opacity: 0.9;
-        }
-
-        .link-button {
-            border: 1px solid #ffffff;
-        }
-
-        main {
-            max-width: 960px;
-            margin: 40px auto;
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-            padding: 24px 28px;
-        }
-
-        h1 {
-            margin-top: 0;
-            font-size: 24px;
-        }
-
-        p {
-            margin: 8px 0 0 0;
-            color: #555;
-        }
-
-        .tagline {
-            margin-top: 12px;
-            color: #888;
-            font-size: 14px;
-        }
-
-        .link-to-studies {
-            margin-top: 20px;
-            font-size: 14px;
-        }
-
-        .link-to-studies a {
-            color: #2b4cff;
             text-decoration: none;
-            font-weight: 600;
         }
 
-        .link-to-studies a:hover {
+        .btn-small-primary {
+            background-color: var(--color-primary);
+            color: #ffffff;
+        }
+
+        .btn-small-primary:hover {
+            background-color: var(--color-primary-strong);
+        }
+
+        .btn-small-secondary {
+            background-color: #ffffff;
+            color: var(--color-text-muted);
+            border: 1px solid var(--color-border-subtle);
+        }
+
+        .btn-small-secondary:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        .empty-text {
+            font-size: 13px;
+            color: var(--color-text-muted);
+            margin-top: 6px;
+        }
+
+        .public-study-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .public-study-item {
+            border-radius: 10px;
+            border: 1px solid var(--color-border-subtle);
+            padding: 10px 12px;
+        }
+
+        .public-study-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .public-study-title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .badge-open {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background-color: var(--color-primary-soft);
+            color: var(--color-primary);
+        }
+
+        .public-study-meta {
+            margin-top: 4px;
+            font-size: 12px;
+            color: var(--color-text-muted);
+        }
+
+        .public-study-actions {
+            margin-top: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .link-small {
+            font-size: 12px;
+            color: var(--color-primary);
+            text-decoration: none;
+        }
+
+        .link-small:hover {
             text-decoration: underline;
+        }
+
+        @media (max-width: 800px) {
+            .dashboard-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
         }
     </style>
 </head>
 <body>
-<header>
-    <div class="brand">
-        <a href="/" style="color: #ffffff; text-decoration: none;">StudyHub</a>
-    </div>
-    <div class="nav-right">
-        <a href="/studies" class="link-btn secondary">스터디 탐색</a>
-        <a href="/my/studies" class="link-btn">내 스터디</a>
+    <!-- 공통 헤더 -->
+    <th:block th:replace="fragments/header :: header"></th:block>
 
-        <!-- 로그인 O -->
-        <span th:if="${loggedIn}" th:text="${loginEmail} + ' 님'">user@example.com 님</span>
-        <form th:if="${loggedIn}" th:action="@{/logout}" method="post" style="margin: 0;">
-            <button type="submit" class="link-button">로그아웃</button>
-        </form>
+    <div class="page-container">
+        <!-- 상단 인사문구 -->
+        <div style="margin-bottom: 18px;">
+            <h2 style="margin: 0; font-size: 22px;">
+                <span th:if="${loggedIn}" th:text="${loginEmail} + ' 님의 스터디 현황'">나의 스터디 현황</span>
+                <span th:if="${!loggedIn}">StudyHub 대시보드</span>
+            </h2>
+            <p class="muted">
+                <span th:if="${loggedIn}">
+                    참여중인 스터디를 한눈에 보고, 바로 스터디룸으로 이동해 보세요.
+                </span>
+                <span th:if="${!loggedIn}">
+                    로그인하면 참여중인 스터디를 한눈에 볼 수 있습니다. 아래에서 공개 스터디도 둘러보세요.
+                </span>
+            </p>
+        </div>
 
-        <!-- 로그인 X -->
-        <a th:if="${!loggedIn}" href="/login" class="link-btn">로그인</a>
-        <a th:if="${!loggedIn}" href="/signup" class="link-btn secondary">회원가입</a>
+        <div class="dashboard-grid">
+            <!-- ✅ 내 스터디 대시보드 -->
+            <section class="dashboard-card">
+                <div class="dashboard-title">내 스터디</div>
+                <div class="dashboard-sub">
+                    지금 참여중인 스터디 목록입니다. 카드에서 바로 스터디 홈으로 이동할 수 있습니다.
+                </div>
+
+                <div th:if="${!loggedIn}">
+                    <p class="empty-text">
+                        로그인 후 내 스터디를 확인할 수 있습니다.
+                        <a th:href="@{/login}" class="link-small">로그인 하러 가기</a>
+                    </p>
+                </div>
+
+                <div th:if="${loggedIn}">
+                    <div th:if="${#lists.isEmpty(myMemberships)}" class="empty-text">
+                        아직 참여중인 스터디가 없습니다.
+                        <a th:href="@{/studies}" class="link-small">공개 스터디 둘러보기</a>
+                    </div>
+
+                    <div class="my-study-list" th:if="${!#lists.isEmpty(myMemberships)}">
+                        <div class="my-study-item" th:each="m : ${myMemberships}">
+                            <div class="my-study-header">
+                                <div class="my-study-title" th:text="${m.study.title}">스터디 제목</div>
+                                <span class="role-badge" th:text="${m.role}">LEADER</span>
+                            </div>
+                            <div class="my-study-meta">
+                                <span th:text="'참여일: ' + ${#temporals.format(m.joinedAt, 'yyyy.MM.dd')}"></span>
+                                <span th:if="${m.study.location != null}"
+                                      th:text="'장소: ' + ${m.study.location}"></span>
+                            </div>
+                            <div class="my-study-actions">
+                                <a class="btn-small btn-small-primary"
+                                   th:href="@{'/room/' + ${m.study.id}}">
+                                    스터디 홈
+                                </a>
+                                <a class="btn-small btn-small-secondary"
+                                   th:href="@{'/room/' + ${m.study.id} + '/board'}">
+                                    게시판
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ✅ 모집중인 공개 스터디 -->
+            <section class="dashboard-card">
+                <div class="dashboard-title">모집중인 스터디</div>
+                <div class="dashboard-sub">
+                    최근 등록된 공개 스터디 일부를 보여줍니다.
+                </div>
+
+                <div th:if="${#lists.isEmpty(publicStudies)}" class="empty-text">
+                    아직 등록된 공개 스터디가 없습니다.
+                    <a th:href="@{/my/studies/new}" class="link-small">첫 번째 스터디를 개설해보세요.</a>
+                </div>
+
+                <div class="public-study-list" th:if="${!#lists.isEmpty(publicStudies)}">
+                    <div class="public-study-item" th:each="study : ${publicStudies}">
+                        <div class="public-study-title-row">
+                            <div class="public-study-title" th:text="${study.title}">스터디 제목</div>
+                            <span class="badge-open">공개 모집</span>
+                        </div>
+                        <div class="public-study-meta">
+                            <span th:text="'카테고리: ' + (${study.category} ?: '미지정')"></span><br/>
+                            <span th:text="'모집 인원: ' + ${study.maxMembers} + '명'"></span>
+                        </div>
+                        <div class="public-study-actions">
+                            <a class="link-small"
+                               th:href="@{'/studies/' + ${study.id}}">
+                                상세 보기
+                            </a>
+                            <a class="link-small"
+                               th:href="@{'/my/studies/' + ${study.id} + '/apply'}"
+                               th:if="${loggedIn}">
+                                바로 신청하기
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 10px; text-align: right;">
+                    <a th:href="@{/studies}" class="link-small">공개 스터디 전체 보기 →</a>
+                </div>
+            </section>
+        </div>
     </div>
-</header>
-<main>
-    <h1 th:text="${title}">StudyHub 메인</h1>
-    <p th:text="${message}">
-        스터디 통합 운영 웹사이트의 시작 페이지입니다.
-    </p>
-    <p class="tagline">
-        앞으로 이 화면에서 스터디 탐색, 내 스터디, 알림, 출석 관리 등의 기능이 들어갈 예정입니다.
-    </p>
-    <div class="link-to-studies">
-        👉 지금 바로 <a href="/studies">공개 스터디 보러가기</a><br>
-        👉 내가 참여 중인 <a href="/my/studies">내 스터디 확인하기</a>
-    </div>
-</main>
 </body>
 </html>

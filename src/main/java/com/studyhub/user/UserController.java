@@ -4,9 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping
@@ -15,9 +13,11 @@ public class UserController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailVerificationService emailVerificationService;
+    private final PasswordResetService passwordResetService;
 
     /**
-     * 회원가입 폼 화면
+     * 회원가입 폼
      */
     @GetMapping("/signup")
     public String showSignupForm(Model model) {
@@ -29,53 +29,47 @@ public class UserController {
      * 회원가입 처리
      */
     @PostMapping("/signup")
-    public String handleSignup(UserRegisterForm form, Model model) {
+    public String handleSignup(@ModelAttribute("form") UserRegisterForm form,
+            Model model) {
 
-        // 1) 필수값 검증
-        if (isBlank(form.getEmail())
-                || isBlank(form.getPassword())
-                || isBlank(form.getConfirmPassword())
-                || isBlank(form.getName())
-                || isBlank(form.getNickname())) {
-
-            model.addAttribute("errorMessage", "필수 항목을 모두 입력해 주세요.");
-            model.addAttribute("form", form);
+        // 1) 간단 검증
+        if (isBlank(form.getEmail()) || isBlank(form.getPassword())
+                || isBlank(form.getConfirmPassword()) || isBlank(form.getName())) {
+            model.addAttribute("errorMessage", "이메일, 이름, 비밀번호는 필수입니다.");
             return "user/signup";
         }
 
-        // 2) 비밀번호 확인 일치 여부
         if (!form.getPassword().equals(form.getConfirmPassword())) {
             model.addAttribute("errorMessage", "비밀번호와 비밀번호 확인이 일치하지 않습니다.");
-            model.addAttribute("form", form);
             return "user/signup";
         }
 
-        // 3) 이메일 중복 체크
+        // 2) 이메일 중복 체크
         if (userRepository.findByEmail(form.getEmail()).isPresent()) {
             model.addAttribute("errorMessage", "이미 사용 중인 이메일입니다.");
-            model.addAttribute("form", form);
             return "user/signup";
         }
 
-        // 4) 비밀번호 암호화
-        String encodedPassword = passwordEncoder.encode(form.getPassword());
-
-        // 5) User 엔티티 생성 및 저장
-        User user = User.builder()
-                .email(form.getEmail())
-                .password(encodedPassword)
-                .name(form.getName())
-                .nickname(form.getNickname())
-                .phone(form.getPhone())
-                .intro(form.getIntro())
-                .role(UserRole.USER)
-                .emailVerified(false) // 나중에 이메일 인증 기능 붙일 예정
-                .build();
+        // 3) 사용자 생성
+        User user = new User();
+        user.setEmail(form.getEmail());
+        user.setPassword(passwordEncoder.encode(form.getPassword()));
+        user.setName(form.getName());
+        user.setNickname(form.getNickname());
+        user.setPhone(form.getPhone());
+        user.setIntro(form.getIntro());
+        user.setRole(UserRole.USER);
+        // 이메일 인증 전이므로 false 유지 (User 엔티티 기본값 가정)
+        user.setEmailVerified(false);
 
         userRepository.save(user);
 
-        // 6) 회원가입 성공 화면으로 이동
-        return "user/signup-success";
+        // 4) 이메일 인증 토큰 생성 + "발송"
+        emailVerificationService.createAndSendVerification(user);
+
+        // 가입 완료 안내 페이지로 이동
+        model.addAttribute("email", user.getEmail());
+        return "user/signup_done";
     }
 
     /**
@@ -84,6 +78,32 @@ public class UserController {
     @GetMapping("/login")
     public String showLoginForm() {
         return "user/login";
+    }
+
+    /**
+     * 비밀번호 재설정 요청 폼
+     */
+    @GetMapping("/forgot-password")
+    public String showForgotPasswordForm() {
+        return "user/forgot_password";
+    }
+
+    /**
+     * 비밀번호 재설정 요청 처리
+     */
+    @PostMapping("/forgot-password")
+    public String handleForgotPassword(@RequestParam("email") String email,
+            Model model) {
+
+        if (isBlank(email)) {
+            model.addAttribute("errorMessage", "이메일을 입력해주세요.");
+            return "user/forgot_password";
+        }
+
+        passwordResetService.requestReset(email);
+
+        model.addAttribute("email", email);
+        return "user/forgot_password_done";
     }
 
     private boolean isBlank(String s) {

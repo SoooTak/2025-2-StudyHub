@@ -18,13 +18,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + email));
 
+        // 이메일 미인증이면 로그인 거부
+        // (User에 boolean emailVerified 필드 있다고 가정)
+        if (!user.isEmailVerified()) {
+            throw new UsernameNotFoundException("이메일 인증이 완료되지 않았습니다.");
+        }
+
         String roleName = user.getRole().name(); // USER 또는 ADMIN
 
-        // 스프링 시큐리티가 사용하는 UserDetails 객체로 변환
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getEmail())
                 .password(user.getPassword())
-                .roles(roleName) // "ROLE_USER" 또는 "ROLE_ADMIN" 으로 자동 변환
+                .roles(roleName) // "ROLE_USER" 또는 "ROLE_ADMIN"
                 .build();
     }
 }

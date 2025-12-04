@@ -17,14 +17,16 @@ public class StudyController {
     private final MembershipRepository membershipRepository;
     private final ApplicationRepository applicationRepository;
     private final UserService userService;
+    private final NotificationService notificationService;
 
     /**
-     * 공개 스터디 목록
+     * 공개 스터디 목록 + 검색/필터/정렬
      */
     @GetMapping("/studies")
-    public String listStudies(Model model) {
-        List<Study> studies = studyRepository.findByIsPublicTrueOrderByCreatedAtDesc();
-        model.addAttribute("studies", studies);
+    public String listStudies(@RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "category", required = false) String category,
+            @RequestParam(value = "sort", required = false) String sort,
+            Model model) {
 
         // 로그인 상태 정보
         User currentUser = userService.getCurrentUser();
@@ -33,6 +35,73 @@ public class StudyController {
         if (loggedIn) {
             model.addAttribute("loginEmail", currentUser.getEmail());
         }
+
+        // 공개 스터디 기본 목록 (최신순)
+        List<Study> studies = studyRepository.findByIsPublicTrueOrderByCreatedAtDesc();
+
+        // 검색어 필터 (제목 + 소개)
+        if (keyword != null && !keyword.isBlank()) {
+            String lowered = keyword.toLowerCase();
+            studies = studies.stream()
+                    .filter(s -> (s.getTitle() != null && s.getTitle().toLowerCase().contains(lowered)) ||
+                            (s.getDescription() != null && s.getDescription().toLowerCase().contains(lowered)))
+                    .toList();
+        }
+
+        // 카테고리 필터 (부분 일치)
+        if (category != null && !category.isBlank()) {
+            String loweredCategory = category.toLowerCase();
+            studies = studies.stream()
+                    .filter(s -> s.getCategory() != null &&
+                            s.getCategory().toLowerCase().contains(loweredCategory))
+                    .toList();
+        }
+
+        // 정렬 (latest, oldest, title)
+        String effectiveSort = (sort == null || sort.isBlank()) ? "latest" : sort;
+        switch (effectiveSort) {
+            case "title":
+                studies = studies.stream()
+                        .sorted(java.util.Comparator.comparing(
+                                Study::getTitle,
+                                java.util.Comparator.nullsLast(String::compareToIgnoreCase)))
+                        .toList();
+                break;
+            case "oldest":
+                studies = studies.stream()
+                        .sorted(java.util.Comparator.comparing(Study::getCreatedAt))
+                        .toList();
+                break;
+            case "latest":
+            default:
+                studies = studies.stream()
+                        .sorted(java.util.Comparator.comparing(Study::getCreatedAt).reversed())
+                        .toList();
+                effectiveSort = "latest";
+                break;
+        }
+
+        // 로그인한 사용자의 참여/신청 상태 (JOINED / PENDING / NONE)
+        java.util.Map<Long, String> joinStatusMap = new java.util.HashMap<>();
+        if (currentUser != null) {
+            for (Study study : studies) {
+                String status = "NONE";
+                if (membershipRepository.existsByStudyAndUser(study, currentUser)) {
+                    status = "JOINED";
+                } else if (applicationRepository
+                        .findByStudyAndApplicantAndStatus(study, currentUser, ApplicationStatus.PENDING)
+                        .isPresent()) {
+                    status = "PENDING";
+                }
+                joinStatusMap.put(study.getId(), status);
+            }
+        }
+
+        model.addAttribute("studies", studies);
+        model.addAttribute("joinStatusMap", joinStatusMap);
+        model.addAttribute("keyword", keyword == null ? "" : keyword);
+        model.addAttribute("category", category == null ? "" : category);
+        model.addAttribute("sort", effectiveSort);
 
         return "studies/list";
     }
@@ -71,9 +140,6 @@ public class StudyController {
         return "studies/detail";
     }
 
-   
-
-
     /**
      * 스터디 가입 신청 폼 (로그인 필요)
      */
@@ -89,23 +155,26 @@ public class StudyController {
             return "redirect:/studies";
         }
 
-        // 이미 멤버이면 신청할 수 없음
+        // 이미 멤버이면 신청 폼 볼 필요 없음 → 상세로 돌려보내기
         if (membershipRepository.existsByStudyAndUser(study, currentUser)) {
             return "redirect:/studies/" + id;
         }
 
-        // 이미 대기중인 신청이 있으면 신청할 수 없음
+        // 이미 대기중 신청이 있으면 폼 안 열어주고 상세로
         if (applicationRepository
                 .findByStudyAndApplicantAndStatus(study, currentUser, ApplicationStatus.PENDING)
                 .isPresent()) {
             return "redirect:/studies/" + id;
         }
 
+        // 폼 초기값 준비
+        StudyApplyForm form = new StudyApplyForm();
+
         model.addAttribute("study", study);
-        model.addAttribute("form", new StudyApplyForm());
+        model.addAttribute("form", form);
+
         return "studies/apply";
     }
-
     /**
      * 스터디 가입 신청 처리 (로그인 필요)
      */

@@ -1,219 +1,193 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title th:text="${study.title} + ' - 스터디 홈 - StudyHub'">스터디 홈 - StudyHub</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f7fb;
-        }
-
-        header {
-            background-color: #2b4cff;
-            color: #ffffff;
-            padding: 12px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .brand {
-            font-size: 20px;
-            font-weight: 600;
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-
-        .nav-right a {
-            color: #ffffff;
-            text-decoration: none;
-            padding: 4px 8px;
-            border-radius: 999px;
-        }
-
-        .nav-right a:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .login-email {
-            font-size: 13px;
-            opacity: 0.9;
-        }
-
-        main {
-            max-width: 1040px;
-            margin: 32px auto;
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-            padding: 22px 24px 26px;
-        }
-
-        h1 {
-            margin: 0;
-            font-size: 22px;
-        }
-
-        .study-meta {
-            margin-top: 8px;
-            font-size: 13px;
-            color: #555;
-        }
-
-        .study-meta span {
-            margin-right: 12px;
-        }
-
-        .role-badge {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 4px 10px;
-            border-radius: 999px;
-            font-size: 12px;
-            background-color: #eef1ff;
-            color: #2b4cff;
-        }
-
-        .grid {
-            margin-top: 22px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-            gap: 16px;
-        }
-
-        .card {
-            border-radius: 10px;
-            border: 1px solid #e0e4f0;
-            padding: 14px 16px;
-            font-size: 14px;
-        }
-
-        .card-title {
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
-
-        .card-desc {
-            font-size: 13px;
-            color: #555;
-            margin-bottom: 10px;
-        }
-
-        .card a {
-            font-size: 13px;
-            color: #2b4cff;
-            text-decoration: none;
-        }
-
-        .card a:hover {
-            text-decoration: underline;
-        }
-
-        .notice {
-            margin-top: 24px;
-            padding: 10px 12px;
-            font-size: 13px;
-            color: #555;
-            background-color: #f5f7ff;
-            border-radius: 8px;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-top: 16px;
-            font-size: 13px;
-            color: #2b4cff;
-            text-decoration: none;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title th:text="${study != null ? study.title + ' · StudyHub' : 'StudyHub'}">StudyHub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- 전역 화이트 테마 -->
+  <link rel="stylesheet" th:href="@{/css/studyhub.css}">
+  <style>
+    /* 페이지 전용: 간단한 2열/1열 그리드 */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .stat {
+      background: var(--color-surface);
+      border-radius: 16px;
+      box-shadow: var(--shadow-card);
+      padding: 16px;
+    }
+    .stat h4 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: var(--color-text-muted);
+      font-weight: 600;
+    }
+    .stat .num {
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--color-primary-soft);
+      color: var(--color-primary);
+      font-size: 12px;
+      margin-right: 6px;
+    }
+    .links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    @media (max-width: 860px) {
+      .grid { grid-template-columns: 1fr; }
+      .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 520px) {
+      .grid-4 { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-<header>
-    <div class="brand">
-        <a href="/" style="color: #ffffff; text-decoration: none;">StudyHub</a>
-    </div>
-    <div class="nav-right">
-        <span th:if="${loggedIn}" class="login-email" th:text="${loginEmail}">user@example.com</span>
-        <a th:if="${loggedIn}" href="/logout">로그아웃</a>
-        <a th:if="${!loggedIn}" href="/login">로그인</a>
-        <a th:if="${!loggedIn}" href="/signup">회원가입</a>
-    </div>
+
+<!-- 사이트 공통 헤더 (화이트) -->
+<th:block th:replace="fragments/header :: header"></th:block>
+
+<!-- 스터디룸 상단 탭 (화이트 테마) -->
+<header class="room-header">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <a class="room-brand" th:href="@{|/room/${study.id}|}"
+       th:text="${study != null ? study.title : '스터디'}">스터디</a>
+    <nav class="room-nav">
+      <a class="active" th:href="@{|/room/${study.id}|}">홈</a>
+      <a th:href="@{|/room/${study.id}/sessions|}">출석</a>
+      <a th:href="@{|/room/${study.id}/board|}">게시판</a>
+      <a th:href="@{|/room/${study.id}/files|}">자료실</a>
+      <a th:href="@{|/room/${study.id}/members|}">멤버</a>
+    </nav>
+  </div>
+  <div class="room-header-right">
+    <span class="role-badge" th:if="${myRole != null}" th:text="${myRole}">MEMBER</span>
+    <a class="btn-secondary" th:href="@{/studies}">다른 스터디 둘러보기</a>
+  </div>
 </header>
 
-<main>
-    <h1 th:text="${study.title}">스터디 제목</h1>
+<main class="page-container">
 
-    <div class="study-meta">
-        <span th:text="'분야: ' + (${study.category} ?: '미지정')">분야</span>
-        <span th:text="'모집 인원: ' + ${study.maxMembers} + '명'">모집 인원</span>
-        <span th:text="'공개 여부: ' + (${study.public} ? '공개' : '비공개')">공개 여부</span>
-        <span th:text="'진행 방식: ' + (${study.studyMode} ?: '미지정')">진행 방식</span>
+  <!-- 상단 요약 카드 -->
+  <section class="card">
+    <h2 class="section-title" th:text="${study != null ? study.title : '스터디'}">스터디</h2>
+    <p class="muted" th:if="${study != null}" th:text="${study.description}">스터디 소개</p>
+
+    <div style="margin-top:10px;">
+      <span class="pill" th:if="${study != null && study.category != null}">
+        카테고리 · <span th:text="${study.category}">ETC</span>
+      </span>
+      <span class="pill" th:if="${study != null && study.studyMode != null}">
+        방식 · <span th:text="${study.studyMode}">ONLINE</span>
+      </span>
+      <span class="pill" th:if="${study != null && study.location != null}">
+        지역 · <span th:text="${study.location}">Seoul</span>
+      </span>
+      <span class="pill" th:if="${study != null && study.maxMembers != null}">
+        정원 · <span th:text="${study.maxMembers}">10</span>
+      </span>
     </div>
 
-    <!-- 내 역할 -->
-    <div class="role-badge"
-         th:text="${isLeader} ? '내 역할: 리더(개설자)' : '내 역할: 멤버'">
-        내 역할
+    <div class="grid-4">
+      <div class="stat">
+        <h4>멤버 수</h4>
+        <div class="num" th:text="${memberCount != null ? memberCount : '-'}">-</div>
+      </div>
+      <div class="stat">
+        <h4>세션 수</h4>
+        <div class="num" th:text="${sessionCount != null ? sessionCount : '-'}">-</div>
+      </div>
+      <div class="stat">
+        <h4>내 출석률</h4>
+        <div class="num" th:text="${myAttendanceRate != null ? myAttendanceRate + '%': '-'}">-</div>
+      </div>
+      <div class="stat">
+        <h4>미확인 알림</h4>
+        <div class="num" th:text="${unreadCount != null ? unreadCount : 0}">0</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 핵심 바로가기 카드 2열 -->
+  <section class="grid">
+    <div class="card">
+      <h3 class="section-title">다음 세션</h3>
+      <div th:if="${nextSession != null}">
+        <p><b th:text="${nextSession.title}">주간 스터디</b></p>
+        <p class="muted" th:text="${#temporals.format(nextSession.startAt, 'yyyy-MM-dd (E) HH:mm')}">2025-12-05 19:00</p>
+        <div class="links" style="margin-top:8px;">
+          <a class="btn-primary" th:href="@{|/room/${study.id}/sessions|}">출석 페이지</a>
+          <a class="btn-secondary" th:href="@{|/room/${study.id}/sessions|}">세션 목록</a>
+        </div>
+      </div>
+      <div th:if="${nextSession == null}">
+        <p class="muted">예정된 세션이 없습니다.</p>
+        <div class="links" style="margin-top:8px;">
+          <a class="btn-secondary" th:href="@{|/room/${study.id}/sessions|}">세션 관리/목록</a>
+        </div>
+      </div>
     </div>
 
-    <!-- 기능 카드 그리드 -->
-    <div class="grid">
-        <div class="card">
-            <div class="card-title">공지 / 소개</div>
-            <div class="card-desc">
-                스터디 규칙, 진행 계획, 공지사항 등을 정리하는 영역입니다.
-            </div>
-            <a href="javascript:void(0);">준비 중입니다</a>
+    <div class="card">
+      <h3 class="section-title">최근 공지</h3>
+      <div th:if="${recentNotice != null}">
+        <p><b th:text="${recentNotice.title}">공지 제목</b></p>
+        <p class="muted" th:text="${#temporals.format(recentNotice.createdAt, 'yyyy-MM-dd HH:mm')}">2025-12-04 09:00</p>
+        <div class="links" style="margin-top:8px;">
+          <a class="btn-primary" th:href="@{|/room/${study.id}/board|}">게시판 가기</a>
+          <a class="btn-secondary" th:href="@{|/room/${study.id}/board|}">전체 보기</a>
         </div>
+      </div>
+      <div th:if="${recentNotice == null}">
+        <p class="muted">아직 등록된 공지가 없습니다.</p>
+        <div class="links" style="margin-top:8px;">
+          <a class="btn-secondary" th:href="@{|/room/${study.id}/board|}">게시판 가기</a>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        <div class="card">
-            <div class="card-title">출석 / 일정</div>
-            <div class="card-desc">
-                주차별 스터디 일정과 출석 체크를 관리하는 화면입니다.
-            </div>
-            <a th:href="@{'/room/' + ${study.id} + '/sessions'}">출석 / 일정 화면으로 이동</a>
-        </div>
-
-        <div class="card">
-            <div class="card-title">게시판 / 질문</div>
-            <div class="card-desc">
-                자료 공유, 질문/답변, 회고 등을 작성할 수 있는 게시판입니다.
-            </div>
-            <a th:href="@{'/room/' + ${study.id} + '/board'}">게시글 목록으로 이동</a>
-        </div>
-
-        <div class="card">
-            <div class="card-title">멤버 관리</div>
-            <div class="card-desc">
-                현재 스터디 인원과 역할(리더/매니저/멤버)을 확인하는 화면입니다.
-                이후 리더/매니저 권한 관리 기능이 추가될 예정입니다.
-            </div>
-            <a th:href="@{'/room/' + ${study.id} + '/members'}"
-               th:text="${isLeader} ? '멤버 관리 화면으로 이동' : '멤버 목록 보기'">
-                멤버 목록 보기
-            </a>
-        </div>
+  <!-- 자료/멤버 바로가기 -->
+  <section class="grid" style="margin-top:12px;">
+    <div class="card">
+      <h3 class="section-title">자료실</h3>
+      <p class="muted">스터디 자료를 업로드하고 다운로드할 수 있습니다.</p>
+      <div class="links" style="margin-top:8px;">
+        <a class="btn-primary" th:href="@{|/room/${study.id}/files|}">자료실 이동</a>
+        <a class="btn-secondary" th:href="@{|/room/${study.id}/files|}">최근 자료</a>
+      </div>
     </div>
 
-    <div class="notice">
-        이 화면은 스터디 내부의 “대시보드”입니다. <br>
-        이곳에서 출석, 일정, 게시판, 멤버 목록 등 세부 화면으로 이동할 수 있습니다.
+    <div class="card">
+      <h3 class="section-title">멤버</h3>
+      <p class="muted">현재 참여 중인 멤버 목록과 역할을 확인하세요.</p>
+      <div class="links" style="margin-top:8px;">
+        <a class="btn-primary" th:href="@{|/room/${study.id}/members|}">멤버 보기</a>
+        <a class="btn-secondary" th:href="@{|/room/${study.id}/members|}">역할/권한</a>
+      </div>
     </div>
+  </section>
 
-    <a th:href="@{'/my/studies'}" class="back-link">← 내 스터디 목록으로 돌아가기</a>
 </main>
+
 </body>
 </html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${study.title} + ' - 자료실 - StudyHub'">자료실 - StudyHub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 전역 화이트 테마 -->
+    <link rel="stylesheet" th:href="@{/css/studyhub.css}">
+
+    <!-- 이 페이지 전용 스타일 -->
+    <style>
+        .files-main {
+            max-width: 1040px;
+            margin: 0 auto;
+        }
+
+        .meta {
+            margin-top: 4px;
+            font-size: 13px;
+            color: var(--color-text-muted);
+        }
+
+        .messages {
+            margin-top: 12px;
+        }
+        .alert {
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+        .alert-success {
+            background-color: #ecfdf3;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+        .alert-error {
+            background-color: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+        }
+
+        .upload-box {
+            margin-top: 16px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px dashed #cbd5f5;
+            background-color: #eff6ff;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+        .upload-box strong {
+            margin-right: 6px;
+        }
+        .upload-box input[type="file"] {
+            font-size: 13px;
+        }
+        .upload-box button {
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: none;
+            background-color: var(--color-primary);
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .upload-box button:hover {
+            background-color: var(--color-primary-strong);
+        }
+        .upload-help {
+            font-size: 12px;
+            color: var(--color-text-muted);
+            margin-top: 4px;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 18px;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 8px 6px;
+            border-bottom: 1px solid var(--color-border-subtle);
+            text-align: left;
+        }
+        th {
+            font-size: 13px;
+            color: var(--color-text-main);
+        }
+        tr:hover {
+            background-color: #f9fafb;
+        }
+        .col-actions {
+            text-align: right;
+            white-space: nowrap;
+        }
+        .btn-link {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid var(--color-border-subtle);
+            background-color: #ffffff;
+            cursor: pointer;
+        }
+        .btn-link:hover {
+            background-color: #eff6ff;
+        }
+        .btn-danger {
+            border-color: #fecaca;
+            color: #b91c1c;
+        }
+        .btn-danger:hover {
+            background-color: #fee2e2;
+        }
+
+        .empty {
+            margin-top: 18px;
+            font-size: 14px;
+            color: var(--color-text-muted);
+        }
+
+        @media (max-width: 640px) {
+            th:nth-child(3), td:nth-child(3) {
+                display: none; /* 용량 컬럼 모바일에서 숨김 */
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- 사이트 공통 헤더 -->
+<th:block th:replace="fragments/header :: header"></th:block>
+
+<!-- 스터디룸 상단 탭 (자료실 탭 활성화) -->
+<header class="room-header">
+    <div style="display:flex;align-items:center;gap:14px;">
+        <a class="room-brand" th:href="@{|/room/${study.id}|}"
+           th:text="${study != null ? study.title : '스터디'}">스터디</a>
+        <nav class="room-nav">
+            <a th:href="@{|/room/${study.id}|}">홈</a>
+            <a th:href="@{|/room/${study.id}/sessions|}">출석</a>
+            <a th:href="@{|/room/${study.id}/board|}">게시판</a>
+            <a class="active" th:href="@{|/room/${study.id}/files|}">자료실</a>
+            <a th:href="@{|/room/${study.id}/members|}">멤버</a>
+        </nav>
+    </div>
+    <div class="room-header-right">
+        <span class="role-badge" th:if="${myRole != null}" th:text="${myRole}">MEMBER</span>
+        <a class="btn-secondary" th:href="@{/studies}">다른 스터디 둘러보기</a>
+    </div>
+</header>
+
+<main class="page-container">
+    <section class="card files-main">
+        <h2 class="section-title" th:text="${study.title} + ' - 자료실'">자료실</h2>
+        <div class="meta">
+            <span th:text="'스터디 ID: ' + ${study.id}">스터디 ID</span>
+        </div>
+
+        <!-- 메시지 -->
+        <div class="messages">
+            <div th:if="${message}" class="alert alert-success"
+                 th:text="${message}">성공 메시지</div>
+            <div th:if="${errorMessage}" class="alert alert-error"
+                 th:text="${errorMessage}">오류 메시지</div>
+        </div>
+
+        <!-- 업로드 박스: 리더/매니저/관리자만 -->
+        <div class="upload-box" th:if="${isLeaderOrManager or isAdmin}">
+            <form th:action="@{'/room/' + ${study.id} + '/files/upload'}"
+                  method="post"
+                  enctype="multipart/form-data">
+                <strong>자료 업로드</strong>
+                <input type="file" name="file" required>
+                <button type="submit">업로드</button>
+                <div class="upload-help">
+                    허용 형식: pdf, ppt, pptx, doc, docx, xls, xlsx, zip, png, jpg, jpeg / 최대 50MB, 스터디당 최대 100개
+                </div>
+            </form>
+        </div>
+
+        <!-- 자료 목록 -->
+        <div th:if="${#lists.isEmpty(files)}" class="empty">
+            아직 업로드된 자료가 없습니다.
+        </div>
+
+        <table th:if="${!#lists.isEmpty(files)}">
+            <thead>
+            <tr>
+                <th>파일명</th>
+                <th>올린 사람</th>
+                <th>크기 (byte)</th>
+                <th>업로드 시각</th>
+                <th class="col-actions">관리</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="file : ${files}">
+                <td>
+                    <a th:href="@{'/room/' + ${study.id} + '/files/' + ${file.id} + '/download'}"
+                       th:text="${file.originalFilename}">파일명</a>
+                </td>
+                <td th:text="${file.uploader != null ? file.uploader.email : '알 수 없음'}">uploader</td>
+                <td th:text="${file.size}">0</td>
+                <td th:text="${#temporals.format(file.uploadedAt, 'yyyy-MM-dd HH:mm')}">2025-01-01 10:00</td>
+                <td class="col-actions">
+                    <form th:if="${isLeaderOrManager or isAdmin}"
+                          th:action="@{'/room/' + ${study.id} + '/files/' + ${file.id} + '/delete'}"
+                          method="post"
+                          style="display:inline;"
+                          onsubmit="return confirm('이 자료를 삭제하시겠습니까?');">
+                        <button type="submit" class="btn-link btn-danger">삭제</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+
+</body>
+</html>

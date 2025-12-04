@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 대시보드 · StudyHub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/studyhub.css}">
+    <style>
+        .dash-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .dash-card {
+            background: var(--color-surface);
+            border-radius: 16px;
+            box-shadow: var(--shadow-card);
+            padding: 16px 20px;
+        }
+        .dash-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .dash-num {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        @media (max-width: 640px) {
+            .dash-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<th:block th:replace="fragments/header :: header"></th:block>
+
+<main class="page-container">
+    <section class="card">
+        <h1 class="section-title">관리자 대시보드</h1>
+        <p class="muted">
+            전체 사용자와 스터디 현황을 한눈에 확인할 수 있습니다.
+        </p>
+
+        <div class="dash-grid">
+            <div class="dash-card">
+                <div class="dash-title">전체 사용자 수</div>
+                <div class="dash-num" th:text="${userCount}">0</div>
+                <a th:href="@{/admin/users}" class="btn-secondary">사용자 목록 보기</a>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-title">전체 스터디 수</div>
+                <div class="dash-num" th:text="${studyCount}">0</div>
+                <a th:href="@{/admin/studies}" class="btn-secondary">스터디 목록 보기</a>
+            </div>
+        </div>
+    </section>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입 완료 · StudyHub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/studyhub.css}">
+</head>
+<body>
+
+<th:block th:replace="fragments/header :: header"></th:block>
+
+<main class="page-container">
+    <section class="card">
+        <h1 class="section-title">회원가입을 완료했습니다.</h1>
+        <p class="muted">
+            <span th:text="${email}">example@studyhub.com</span>
+            로 이메일 인증 링크를 보냈습니다.<br>
+            이메일의 링크를 클릭해 인증을 완료한 뒤 로그인해 주세요.
+        </p>
+        <div style="margin-top:16px;">
+            <a th:href="@{/login}" class="btn-primary">로그인 페이지로 이동</a>
+        </div>
+    </section>
+</main>
+
+</body>
+</html>

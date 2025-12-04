@@ -13,6 +13,8 @@ public interface MembershipRepository extends JpaRepository<Membership, Long> {
 
     // 특정 스터디의 모든 멤버십 목록 (리더 출석부 등에서 사용)
     List<Membership> findByStudy(Study study);
+    
+    List<Membership> findByUserOrderByJoinedAtAsc(User user);
 
     // 특정 스터디 + 특정 유저의 멤버십 1건
     Optional<Membership> findByStudyAndUser(Study study, User user);
